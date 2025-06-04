@@ -1,13 +1,44 @@
+"use client"
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { db } from '@/lib/firebase';
+import { ref, get, update } from 'firebase/database';
+
 import {TextInput} from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
 function JoinRoom() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [roomId, setRoomId] = useState("")
+
+  const joinRoom = async () => {
+    try {
+      const roomRef = ref(db, `rooms/${roomId}`);
+      const snapshot = await get(roomRef);
+
+      if (!snapshot.exists()) {
+        alert("Room not found!");
+        return;
+      }
+
+      const room = snapshot.val();
+      const updatedPlayers = [...(room.players || []), { name }];
+
+      await update(roomRef, { players: updatedPlayers });
+      router.push(`/room/${roomId}`);
+    } catch (error) {
+      console.error("Firebase joinRoom error:", error);
+    }
+  };
+
   return(
     <div className='flex flex-col justify-center items-center w-full h-screen'>
       <div>Join Room</div>
-      <TextInput label="Your Name:" />
-      <TextInput label="Room Code:" />
-      <Button text="Enter" />
+      <TextInput label="Your Name:" onChange={(e) => {setName(e.target.value)}} />
+      <TextInput label="Room Code:" onChange={(e) => {setRoomId(e.target.value)}} />
+      <Button text="Enter" onClick={joinRoom} />
     </div>
   )
 }

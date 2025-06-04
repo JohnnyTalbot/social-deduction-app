@@ -1,9 +1,9 @@
 import React from 'react';
 
-interface ButtonProps{
+type ButtonProps = {
   text: string;
   className?: string;
-}
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 function Button({text, className, ...props}: ButtonProps) {
   return(
