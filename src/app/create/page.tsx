@@ -24,6 +24,9 @@ function CreateRoom() {
         storyteller: name,
         players: []
       });
+      localStorage.setItem('name', name)
+      localStorage.setItem('role', 'storyteller')
+      localStorage.setItem('roomId', id)
       router.push(`/room/${id}`);
     } catch (error) {
       console.error("Firebase set error:", error);

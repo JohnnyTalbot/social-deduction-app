@@ -26,6 +26,9 @@ function JoinRoom() {
       const room = snapshot.val();
       const updatedPlayers = [...(room.players || []), { name }];
 
+      localStorage.setItem('name', name)
+      localStorage.setItem('role', 'player')
+      localStorage.setItem('roomId', roomId)
       await update(roomRef, { players: updatedPlayers });
       router.push(`/room/${roomId}`);
     } catch (error) {
