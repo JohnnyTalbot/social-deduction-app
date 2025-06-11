@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { ref, set } from 'firebase/database';
+import { ref, set, serverTimestamp } from 'firebase/database';
+import { Room, Player } from '@/types/game';
 
 import { TextInput, NumberInput } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -18,16 +19,34 @@ function CreateRoom() {
 
   const createRoom = async () => {
     try {
-      const id = generateRoomId();
-      const roomRef = ref(db, `rooms/${id}`);
-      await set(roomRef, {
-        storyteller: name,
-        players: []
-      });
-      localStorage.setItem('name', name)
+      const newRoomId = generateRoomId();
+      const playerId = crypto.randomUUID();
+
+      const newPlayer: Player = {
+        id: playerId,
+        name: name,
+        isStoryteller: true
+      }
+      const newRoom: Room = {
+        id: newRoomId,
+        storytellerId: newPlayer.id,
+        storytellerName: newPlayer.name,
+        createdAt: Date.now(),
+        status: 'waiting',
+        players: {[playerId]: newPlayer},
+        currentRound: 1,
+        currentPhase: 'setup'
+      }
+
+      const roomRef = ref(db, `rooms/${newRoom.id}`);
+      await set(roomRef, newRoom);
+
+      localStorage.setItem('uuid', newPlayer.id)
+      localStorage.setItem('name', newPlayer.name)
       localStorage.setItem('role', 'storyteller')
-      localStorage.setItem('roomId', id)
-      router.push(`/room/${id}`);
+      localStorage.setItem('roomId', newRoom.id)
+
+      router.push(`/room/${newRoom.id}`);
     } catch (error) {
       console.error("Firebase set error:", error);
     }

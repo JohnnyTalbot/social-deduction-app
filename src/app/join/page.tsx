@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
-import { ref, get, update } from 'firebase/database';
+import { ref, get, set } from 'firebase/database';
+
+import { Player } from '@/types/game';
 
 import {TextInput} from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -23,13 +25,21 @@ function JoinRoom() {
         return;
       }
 
-      const room = snapshot.val();
-      const updatedPlayers = [...(room.players || []), { name }];
+      const playerId = crypto.randomUUID();
+      const newPlayer: Player = {
+        id: playerId,
+        name: name,
+        isStoryteller: false
+      }
 
-      localStorage.setItem('name', name)
+      const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);
+
+      localStorage.setItem('uuid', newPlayer.id)
+      localStorage.setItem('name', newPlayer.name)
       localStorage.setItem('role', 'player')
       localStorage.setItem('roomId', roomId)
-      await update(roomRef, { players: updatedPlayers });
+
+      await set(playerRef, newPlayer);
       router.push(`/room/${roomId}`);
     } catch (error) {
       console.error("Firebase joinRoom error:", error);

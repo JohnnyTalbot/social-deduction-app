@@ -2,8 +2,10 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { ref, onValue } from 'firebase/database';
+import { ref, push, onValue, set, update, get, onDisconnect } from 'firebase/database';
 import { db } from '@/lib/firebase';
+
+import { Room, Player } from '@/types/game';
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Cylinder, Box } from '@react-three/drei';
@@ -22,27 +24,72 @@ function Sphere() {
   )
 }
 
-function Room() {
+function Plus() {
+  return(
+    <>
+      <Box args={[0.1, 0.35, 0.1]} position={[4.3, 1.2, 0]}>
+        <meshStandardMaterial color="green" emissive="green" />
+      </Box>
+      <Box args={[0.1, 0.1, 0.35]} position={[4.3, 1.2, 0]}>
+        <meshStandardMaterial color="green" emissive="green" />
+      </Box>
+    </>
+  )
+}
+
+function RoomPage() {
   const { roomId } = useParams();
-  const [roomData, setRoomData] = useState(null);
-  const [role, setRole] = useState('');
-  const [name, setName] = useState('')
+  const [roomData, setRoomData] = useState<Room>();
+  const [playerData, setPlayerData] = useState<Player>()
   
 
   // get update changes on db
   useEffect(() => {
     if (!roomId) return;
 
-    const roleVal = localStorage.getItem('role') || ""
-    const nameVal = localStorage.getItem('name') || ""
+    const fetchRoomAndPlayer = async () => {
+      const uuid = localStorage.getItem("uuid");
+      console.log(uuid)
+      try {
+        const roomSnap = await get(ref(db, `rooms/${roomId}`));
+        if (roomSnap.exists()) {
+          setRoomData(roomSnap.val());
+        }
 
-    setRole(roleVal) 
-    setName(nameVal)
+        if (uuid) {
+          const playerRef = ref(db, `rooms/${roomId}/players/${uuid}`)
+          const playerSnap = await get(playerRef);
+          if (playerSnap.exists()) {
+            const player = playerSnap.val();
+            setPlayerData(player);
+
+            onValue(ref(db, ".info/connected"), (snap) => {
+              if (snap.val() === false) return;
+
+              update(playerRef, {
+                state: "online",
+                last_changed: Date.now(),
+              });
+
+              onDisconnect(playerRef).update({
+                state: "offline",
+                last_changed: Date.now(),
+              });
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching room or player:", err);
+      }
+    };
+
+    fetchRoomAndPlayer();
 
     const roomRef = ref(db, `rooms/${roomId}`);
     const unsubscribe = onValue(roomRef, (snapshot) => {
       setRoomData(snapshot.val());
     });
+
     return () => unsubscribe();
   }, [roomId]);
 
@@ -53,18 +100,31 @@ function Room() {
         <ambientLight intensity={0.1} />
         <directionalLight color={"yellow"} position={[0, 10, 10]} />
         <Table />
+        <Plus />
         <Character />
         {/* <Sphere /> */}
         <OrbitControls />
       </Canvas>
-      {/* <pre>{JSON.stringify(roomData, null, 2)}</pre> */}
-      <p>{role}</p>
-      <p>{name}</p>
-
-      {roomId && <ChatBox roomId={roomId} name={name} />}
+      {
+        playerData && roomData ?
+        <>
+          <p>{playerData.name}</p>
+          <p>{playerData.isStoryteller ? "Storyteller" : "Player"}</p>
+          <ChatBox roomId={roomData.id} player={playerData} />
+          <div className='absolute right-0 p-2 border-white border-2'>
+            {roomData.players &&
+              Object.values(roomData.players).map((player) => (
+                <div key={player.id} className="text-white">
+                  {player.name} {player.isStoryteller ? '(Storyteller)' : '(Player)'} : {player.state == 'online' ? 'online' : 'offline'}
+                </div>
+              ))}
+          </div>
+        </>
+        : ""
+      }
       
     </div>
   )
 };
 
-export default Room;
+export default RoomPage;

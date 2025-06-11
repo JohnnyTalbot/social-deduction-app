@@ -4,21 +4,17 @@ import { useState, useEffect } from 'react';
 import { ref, push, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
+import { Player, Message } from '@/types/game';
+
 import Button from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/Input';
 
 interface ChatBoxProps {
   roomId: string | string[];
-  name: string;
+  player: Player;
 }
 
-interface Message {
-  text: string;
-  timestamp: number;
-  sender?: string; // optional, you can adjust as needed
-}
-
-export default function ChatBox({ roomId, name }: ChatBoxProps) {
+export default function ChatBox({ roomId, player }: ChatBoxProps) {
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState<Message[]>([]);
 
@@ -39,12 +35,17 @@ export default function ChatBox({ roomId, name }: ChatBoxProps) {
   const sendMessage = async () => {
     if (!message.trim()) return;
 
-    const messageRef = ref(db, `rooms/${roomId}/chat`);
-    await push(messageRef, {
+    const messageId = crypto.randomUUID()
+    const newMessage: Message = {
+      id: messageId,
+      senderId: player.id,
+      senderName: player.name,
       text: message,
-      sender: name,
-      timestamp: Date.now(),
-    });
+      timestamp: Date.now()
+    }
+
+    const messageRef = ref(db, `rooms/${roomId}/chat`);
+    await push(messageRef, newMessage);
 
     setMessage('');
   };
@@ -53,8 +54,8 @@ export default function ChatBox({ roomId, name }: ChatBoxProps) {
     <div className="absolute left-0 p-2 border rounded w-[250px]">
       <div className="h-[200px] overflow-y-scroll border mb-2 p-1">
         {chat.map((msg, idx) => (
-          <div key={idx} className="mb-1 text-sm">
-            {msg.sender} - {msg.text}
+          <div key={idx} className="flex flex-row gap-1 mb-1 text-sm">
+            {msg.senderName ? <p>{msg.senderName}:</p> : ""} <p>{msg.text}</p>
           </div>
         ))}
       </div>
