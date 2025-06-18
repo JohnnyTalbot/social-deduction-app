@@ -1,19 +1,27 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
-export default function Character() {
-  const { scene, nodes } = useGLTF('/models/characters/character-male-a.glb')
-  const armBone = useRef(nodes["arm-left"])
+interface CharacterProps {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  model: string; // e.g., "male-a", "female-b"
+}
+
+export default function Character({ position, rotation, model }: CharacterProps) {
+  const modelPath = `/models/characters/character-${model}.glb`;
+  const { scene, nodes } = useGLTF(modelPath);
+  const armBone = useRef(nodes["arm-left"]);
 
   useFrame(() => {
     if (armBone.current) {
-      armBone.current.rotation.z = Math.sin(Date.now() * 0.001) * 0.5 // wave motion
+      armBone.current.rotation.z = Math.sin(Date.now() * 0.001) * 0.5;
     }
-  })
+  });
+
   return (
-    <mesh position={[0, 0, -4.5]}>
+    <mesh position={position} rotation={rotation}>
       <primitive object={scene} scale={3} />
     </mesh>
-    )
+  );
 }

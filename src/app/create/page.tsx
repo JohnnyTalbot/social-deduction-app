@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { ref, set, serverTimestamp } from 'firebase/database';
-import { Room, Player } from '@/types/game';
+import { Room, Player, Seat } from '@/types/game';
 
 import { TextInput, NumberInput } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -22,10 +22,17 @@ function CreateRoom() {
       const newRoomId = generateRoomId();
       const playerId = crypto.randomUUID();
 
+      // create list of seats
+      const seats: Seat[] = Array.from({ length: 12 }, (_, index) => ({
+        number: index + 1,
+        isTaken: false,
+      }));
+
       const newPlayer: Player = {
         id: playerId,
         name: name,
-        isStoryteller: true
+        isStoryteller: true,
+        isSeated: false,
       }
       const newRoom: Room = {
         id: newRoomId,
@@ -34,6 +41,7 @@ function CreateRoom() {
         createdAt: Date.now(),
         status: 'waiting',
         players: {[playerId]: newPlayer},
+        seats: seats,
         currentRound: 1,
         currentPhase: 'setup'
       }

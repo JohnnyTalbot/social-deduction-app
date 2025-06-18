@@ -7,42 +7,19 @@ import { db } from '@/lib/firebase';
 
 import { Room, Player } from '@/types/game';
 
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Cylinder, Box } from '@react-three/drei';
-
+import GameArea from './GameArea';
 import Loading from '@/components/Loading';
 import ChatBox from '@/components/ChatBox';
 
-import Character from '@/components/models/Character';
-import Table from '@/components/models/Table';
-
-function Sphere() {
-  return(
-    <mesh position={[1.5, 1, 0]}>
-      <sphereGeometry args={[0.3, 50, 100]} />
-      <meshStandardMaterial color="green" emissive={"green"} />
-    </mesh>
-  )
-}
-
-function Plus() {
-  return(
-    <>
-      <Box args={[0.1, 0.35, 0.1]} position={[4.3, 1.2, 0]}>
-        <meshStandardMaterial color="green" emissive="green" />
-      </Box>
-      <Box args={[0.1, 0.1, 0.35]} position={[4.3, 1.2, 0]}>
-        <meshStandardMaterial color="green" emissive="green" />
-      </Box>
-    </>
-  )
-}
 
 function RoomPage() {
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [roomData, setRoomData] = useState<Room>();
   const [playerData, setPlayerData] = useState<Player>();
+
+  const isLocalRoomUpdate = useRef(false);
+  const isLocalPlayerUpdate = useRef(false);
 
 
   // get update changes on db
@@ -96,32 +73,76 @@ function RoomPage() {
     return () => unsubscribe();
   }, [roomId]);
 
+  // Update Firebase whenever local roomData changes
+  useEffect(() => {
+    if (!roomData || !isLocalRoomUpdate.current) return;
+
+    const roomRef = ref(db, `rooms/${roomData.id}`);
+    update(roomRef, roomData);
+    isLocalRoomUpdate.current = false;
+  }, [roomData]);
+
+  // Update Firebase whenever local playerData changes
+  useEffect(() => {
+    if (!playerData || !roomId || !isLocalPlayerUpdate.current) return;
+
+    const playerRef = ref(db, `rooms/${roomId}/players/${playerData.id}`);
+    update(playerRef, playerData);
+    isLocalPlayerUpdate.current = false;
+  }, [playerData, roomId]);
+
+  // Handle player data updates
+  const updatePlayerData = (partial: Partial<Player>) => {
+    if (!playerData) return;
+
+    const updatedPlayer = {
+      ...playerData,
+      ...partial,
+    };
+
+    isLocalPlayerUpdate.current = true;
+    setPlayerData(updatedPlayer);
+  };
+
+
+  // Handle room data updates
+  const updateRoomData = (partial: Partial<Room>) => {
+    if (!roomData) return;
+
+    const updatedRoom = {
+      ...roomData,
+      ...partial,
+    };
+
+    isLocalRoomUpdate.current = true;
+    setRoomData(updatedRoom);
+  };
+
   if (loading) {
     return <Loading />;
   }
   return(
     <div className='flex flex-col justify-center items-center w-full h-screen'>
-      <h1 className='absolute top-0'>Room Code: {roomId}</h1>
-      <Canvas>
-        <ambientLight intensity={0.1} />
-        <directionalLight color={"yellow"} position={[0, 10, 10]} />
-        <Table />
-        <Plus />
-        <Character />
-        {/* <Sphere /> */}
-        <OrbitControls />
-      </Canvas>
+      <GameArea 
+        roomData={roomData} 
+        playerData={playerData} 
+        updatePlayerData={updatePlayerData} 
+        updateRoomData={updateRoomData} 
+      />
       {
         playerData && roomData ?
         <>
+          <h1 className='absolute top-0'>Room Code: {roomId}</h1>
           <p>{playerData.name}</p>
-          <p>{playerData.isStoryteller ? "Storyteller" : "Player"}</p>
+          <p>{playerData.isStoryteller ? '(Storyteller)' : playerData.isSeated ? '(Player)' : '(Spectator)'}</p>
           <ChatBox roomId={roomData.id} player={playerData} />
           <div className='absolute right-0 p-2 border-white border-2'>
             {roomData.players &&
-              Object.values(roomData.players).map((player) => (
+              Object.values(roomData.players)
+              .filter((player) => player.state === 'online')
+              .map((player) => (
                 <div key={player.id} className="text-white">
-                  {player.name} {player.isStoryteller ? '(Storyteller)' : '(Player)'} : {player.state == 'online' ? 'online' : 'offline'}
+                  {player.name} {player.isStoryteller ? '(Storyteller)' : player.isSeated ? '(Player)' : '(Spectator)'}
                 </div>
               ))}
           </div>

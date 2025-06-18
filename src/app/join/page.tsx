@@ -29,7 +29,8 @@ function JoinRoom() {
       const newPlayer: Player = {
         id: playerId,
         name: name,
-        isStoryteller: false
+        isStoryteller: false,
+        isSeated: false,
       }
 
       const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);
