@@ -10,6 +10,7 @@ import { Room, Player } from '@/types/game';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Cylinder, Box } from '@react-three/drei';
 
+import Loading from '@/components/Loading';
 import ChatBox from '@/components/ChatBox';
 
 import Character from '@/components/models/Character';
@@ -39,9 +40,10 @@ function Plus() {
 
 function RoomPage() {
   const { roomId } = useParams();
+  const [loading, setLoading] = useState(true);
   const [roomData, setRoomData] = useState<Room>();
-  const [playerData, setPlayerData] = useState<Player>()
-  
+  const [playerData, setPlayerData] = useState<Player>();
+
 
   // get update changes on db
   useEffect(() => {
@@ -49,7 +51,6 @@ function RoomPage() {
 
     const fetchRoomAndPlayer = async () => {
       const uuid = localStorage.getItem("uuid");
-      console.log(uuid)
       try {
         const roomSnap = await get(ref(db, `rooms/${roomId}`));
         if (roomSnap.exists()) {
@@ -77,6 +78,8 @@ function RoomPage() {
               });
             });
           }
+
+          setLoading(false);
         }
       } catch (err) {
         console.error("Error fetching room or player:", err);
@@ -93,6 +96,9 @@ function RoomPage() {
     return () => unsubscribe();
   }, [roomId]);
 
+  if (loading) {
+    return <Loading />;
+  }
   return(
     <div className='flex flex-col justify-center items-center w-full h-screen'>
       <h1 className='absolute top-0'>Room Code: {roomId}</h1>
