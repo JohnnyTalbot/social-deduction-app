@@ -71,22 +71,23 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
         // Rotation: look at the center
         const position = new THREE.Vector3(x, y, z)
         const lookAtVector = new THREE.Vector3().subVectors(center, position)
-        const CharacterrotationY = Math.atan2(lookAtVector.x, lookAtVector.z)
-        const PlusrotationY = Math.atan2(lookAtVector.x, lookAtVector.z) + Math.PI / 2;
+        const CharacterRotationY = Math.atan2(lookAtVector.x, lookAtVector.z)
+        const PlusRotationY = Math.atan2(lookAtVector.x, lookAtVector.z) + Math.PI / 2;
 
         return (
           seat.isTaken ?
           <Character
             key={seat.playerId || seat.number}
             position={[x, 0, z]}
-            rotation={[0, CharacterrotationY, 0]}
+            rotation={[0, CharacterRotationY, 0]}
             model={seat.number % 2 == 0 ? "male-a" : "female-b"}
+            name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
           />
           :
           <Plus
             key={i}
             position={[x, y, z]}
-            rotation={[0, PlusrotationY, 0]}
+            rotation={[0, PlusRotationY, 0]}
             onClick={() => handleSeatedClick(seat)}
           />
         )
