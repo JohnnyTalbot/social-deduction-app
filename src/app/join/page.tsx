@@ -25,12 +25,16 @@ function JoinRoom() {
         return;
       }
 
+      // list of models
+      const models = ['male-a', 'male-b', 'male-c', 'male-d', 'male-e', 'male-f', 'female-a', 'female-b', 'female-c', 'female-d', 'female-e', 'female-f'];
+
       const playerId = crypto.randomUUID();
       const newPlayer: Player = {
         id: playerId,
         name: name,
         isStoryteller: false,
         isSeated: false,
+        model: models[Math.floor(Math.random() * models.length)],
       }
 
       const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);

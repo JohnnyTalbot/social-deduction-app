@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ref, update } from 'firebase/database';
+import { ref, update, onValue, off } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { Player, Room } from '@/types/game';
 
@@ -33,6 +33,23 @@ export function useRoomSync(roomId: string) {
     update(ref(db, `rooms/${roomId}/players/${playerData.id}`), playerData);
     isLocalPlayerUpdate.current = false;
   }, [playerData, roomId]);
+
+  // Listen for room data changes
+  useEffect(() => {
+    if (!roomId) return;
+
+    const roomRef = ref(db, `rooms/${roomId}`);
+    const unsubscribePlayers = onValue(roomRef, (snapshot) => {
+      const room = snapshot.val();
+      if (room) {
+        setRoomData((prev) => prev ? { ...prev, ...room } : prev);
+      }
+    });
+
+    return () => off(roomRef, 'value', unsubscribePlayers);
+  }, [roomId]);
+
+
 
   return {
     roomData,

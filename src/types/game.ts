@@ -4,6 +4,7 @@ export interface Player {
   id: string;
   name: string;
   isStoryteller: boolean;
+  model?: string;
   isSeated: boolean;
   seatNumber?: number;
   state?: "online" | "offline",

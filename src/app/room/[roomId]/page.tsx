@@ -7,6 +7,8 @@ import { db } from "@/lib/firebase";
 import { Room, Player } from "@/types/game";
 import { useRoomSync } from "@/hooks/useRoomSync";
 import { usePresence } from "@/hooks/usePresence";
+
+import ModelPreload from '@/components/ModelPreload';
 import GameArea from "./GameArea";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
@@ -62,6 +64,7 @@ function RoomPage() {
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen">
+      <ModelPreload />
       <GameArea
         roomData={roomData}
         playerData={playerData}

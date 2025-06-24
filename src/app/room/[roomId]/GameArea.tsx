@@ -1,5 +1,5 @@
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Cylinder, Box } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 import { Room, Player, Seat } from '@/types/game';
@@ -7,7 +7,6 @@ import { Room, Player, Seat } from '@/types/game';
 import Plus from '@/components/models/Plus';
 import Character from '@/components/models/Character';
 import Table from '@/components/models/Table';
-import { update } from 'firebase/database';
 
 interface GameAreaProps {
   roomData: Room | unknown;
@@ -52,6 +51,8 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
     updatePlayerData({ seatNumber: seat.number, isSeated: true });
   };
 
+  if (!roomData || !playerData) return null;
+
   return (
     <Canvas>
       <ambientLight intensity={0.1} />
@@ -77,15 +78,15 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
         return (
           seat.isTaken ?
           <Character
-            key={seat.playerId || seat.number}
+            key={`seat-${seat.number}`}
             position={[x, 0, z]}
             rotation={[0, CharacterRotationY, 0]}
-            model={seat.number % 2 == 0 ? "male-a" : "female-b"}
+            model={(roomData as Room).players[seat.playerId || '']?.model || 'male-a'}
             name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
           />
           :
           <Plus
-            key={i}
+            key={`seat-${seat.number}`}
             position={[x, y, z]}
             rotation={[0, PlusRotationY, 0]}
             onClick={() => handleSeatedClick(seat)}
