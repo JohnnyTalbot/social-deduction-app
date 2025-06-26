@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #220E2B;
-  --text-primary: #EFE8D6;
+  --color-bg: #FBEC8C;
+  --card-bg: #D1BB87;
+  --text-primary: #7B5D4E;
 }
 
 html, body{
@@ -11,7 +12,38 @@ html, body{
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Amatic SC", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
   color: var(--text-primary);
   background-color: var(--color-bg);
+}
+
+.text-roboto{
+  font-family: "Roboto", sans-serif;
+}
+
+.text-light{
+  color: #F3ECDC;
+}
+
+.text-purple-dark{
+  color: #31154F;
+}
+
+.text-placeholder {
+  color: #D1BB87;
+}
+
+.text-input{
+  color: #7B5D4E;
+}
+
+.bg-input{
+  background-color: #F3ECDC;
+}
+
+.bg-card {
+  background-color: var(--card-bg);
 }

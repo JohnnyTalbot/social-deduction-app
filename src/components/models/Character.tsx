@@ -33,25 +33,25 @@ export default function Character({ position, rotation, model, name }: Character
 
 
   // Use useLayoutEffect for finding the arm, as it relies on the actual mounted object
-  useLayoutEffect(() => {
-    if (!clonedScene || !characterGroupRef.current) {
-        armRef.current = null; // Clear armRef if not ready
-        return;
-    }
-    const foundArm = clonedScene.getObjectByName('arm-left'); // Search on the cloned object directly
+  // useLayoutEffect(() => {
+  //   if (!clonedScene || !characterGroupRef.current) {
+  //       armRef.current = null; // Clear armRef if not ready
+  //       return;
+  //   }
+  //   const foundArm = clonedScene.getObjectByName('arm-left'); // Search on the cloned object directly
 
-    if (foundArm) {
-      armRef.current = foundArm;
-    } else {
-      armRef.current = null;
-    }
-  }, [clonedScene, name]);
+  //   if (foundArm) {
+  //     armRef.current = foundArm;
+  //   } else {
+  //     armRef.current = null;
+  //   }
+  // }, [clonedScene, name]);
 
-  useFrame(() => {
-    if (armRef.current) {
-      armRef.current.rotation.z = Math.sin(Date.now() * 0.002) * 0.5;
-    }
-  });
+  // useFrame(() => {
+  //   if (armRef.current) {
+  //     armRef.current.rotation.z = Math.sin(Date.now() * 0.002) * 0.5;
+  //   }
+  // });
 
   if (!clonedScene) return null;
 
@@ -60,10 +60,9 @@ export default function Character({ position, rotation, model, name }: Character
       ref={characterGroupRef}
       position={position}
       rotation={rotation}
-      scale={[3, 3, 3]}
       key={`character-group-${model}-${name}`}
     >
-      <primitive object={clonedScene} />
+      <primitive object={clonedScene} scale={[3, 3, 3]} />
 
       {name && (
         <Text
