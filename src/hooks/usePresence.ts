@@ -1,43 +1,60 @@
-import { useEffect } from 'react';
-import { ref, set, onDisconnect, onValue, off, update, remove, get } from 'firebase/database';
+import { useEffect, useRef } from 'react';
+import { ref, set, onDisconnect, onValue, off, update, remove } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { Player } from '@/types/game';
 
 export function usePresence(roomId: string, playerId: string, playerData?: Player) {
+  const seatNumberRef = useRef<number | null>(playerData?.seatNumber ?? null);
+
+  // Keep ref in sync with latest seat number
   useEffect(() => {
+    seatNumberRef.current = playerData?.seatNumber ?? null;
+  }, [playerData?.seatNumber]);
+
+  useEffect(() => {
+    if (!roomId || !playerId) return;
+
     const tabId = crypto.randomUUID();
     const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);
     const presenceRef = ref(db, `rooms/${roomId}/players/${playerId}/presence/${tabId}`);
     const allTabsRef = ref(db, `rooms/${roomId}/players/${playerId}/presence`);
     const connectedRef = ref(db, ".info/connected");
 
-    const connectionListener = onValue(connectedRef, (snap) => {
-      if (snap.val() === false) return;
-      set(presenceRef, true);
-      onDisconnect(presenceRef).remove();
+    const unsubscribeConnected = onValue(connectedRef, (snap) => {
+      if (snap.val() === true) {
+        set(presenceRef, true).then(() => {
+          onDisconnect(presenceRef).remove();
+        });
+      }
     });
 
-    const presenceListener = onValue(allTabsRef, async (snapshot) => {
+    const unsubscribePresence = onValue(allTabsRef, async (snapshot) => {
+      console.log("Presence snapshot:", snapshot.val());
       const isOnline = snapshot.exists();
-      const updates: any = {
+      const updates: Record<string, any> = {
         state: isOnline ? "online" : "offline",
-        last_changed: Date.now()
+        last_changed: Date.now(),
       };
 
-      if (!isOnline && playerData?.seatNumber !== undefined) {
-        const seatIndex = playerData.seatNumber - 1;
-        updates["isSeated"] = false;
-        updates["seatNumber"] = null;
-        updates[`/rooms/${roomId}/seats/${seatIndex}/isTaken`] = false;
-        updates[`/rooms/${roomId}/seats/${seatIndex}/playerId`] = null;
+      // Use ref instead of possibly-stale prop
+      const seatNumber = seatNumberRef.current;
+      if (!isOnline && seatNumber !== null && seatNumber !== undefined) {
+        const seatIndex = seatNumber - 1;
+        updates.isSeated = false;
+        updates.seatNumber = null;
+
+        await update(ref(db), {
+          [`rooms/${roomId}/seats/${seatIndex}/isTaken`]: false,
+          [`rooms/${roomId}/seats/${seatIndex}/playerId`]: '',
+        });
       }
 
-      update(playerRef, updates);
+      await update(playerRef, updates);
     });
 
     return () => {
-      off(connectedRef, "value", connectionListener);
-      off(allTabsRef, "value", presenceListener);
+      unsubscribeConnected();
+      unsubscribePresence();
       remove(presenceRef);
     };
   }, [roomId, playerId]);

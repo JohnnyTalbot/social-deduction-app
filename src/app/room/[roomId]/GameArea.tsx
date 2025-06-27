@@ -54,11 +54,10 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
   if (!roomData || !playerData) return null;
 
   return (
-    <Canvas>
-      <ambientLight intensity={0.1} />
-      <directionalLight color={"yellow"} position={[0, 10, 10]} />
+    <Canvas camera={{ position: [-5, 4, 4] }}>
+      <ambientLight intensity={0.5} />
+      <directionalLight color={"yellow"} position={[0, 20, 0]} />
       <Table />
-      {/* <Character position={[0, 0, -4.5]} /> */}
       <OrbitControls />
 
       {(roomData as Room).seats.map((seat, i) => {

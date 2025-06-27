@@ -9,6 +9,7 @@ import { useRoomSync } from "@/hooks/useRoomSync";
 import { usePresence } from "@/hooks/usePresence";
 
 import ModelPreload from '@/components/ModelPreload';
+import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
@@ -64,6 +65,7 @@ function RoomPage() {
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen">
+      {playerData?.isStoryteller && <PresenceWatcher roomId={roomId as string} />}
       <ModelPreload />
       <GameArea
         roomData={roomData}
