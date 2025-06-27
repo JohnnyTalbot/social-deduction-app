@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ref, push, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
 import { Player, Message } from '@/types/game';
 
-import Button from '@/components/ui/Button';
 import { TextInput } from '@/components/ui/Input';
+import MessageBubble from './ui/MessageBubble';
 
 interface ChatBoxProps {
   roomId: string | string[];
@@ -17,6 +17,12 @@ interface ChatBoxProps {
 export default function ChatBox({ roomId, player }: ChatBoxProps) {
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState<Message[]>([]);
+
+  // auto scroll bottom
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat]);
 
   useEffect(() => {
     if (!roomId) return;
@@ -51,20 +57,25 @@ export default function ChatBox({ roomId, player }: ChatBoxProps) {
   };
 
   return (
-    <div className="absolute left-0 p-2 border rounded w-[250px]">
-      <div className="h-[200px] overflow-y-scroll border mb-2 p-1">
+    <div className="p-2 w-full">
+      <div className="h-[300px] w-[400px] custom-scrollbar overflow-y-scroll mb-2 p-1">
         {chat.map((msg, idx) => (
-          <div key={idx} className="flex flex-row gap-1 mb-1 text-sm">
-            {msg.senderName ? <p>{msg.senderName}:</p> : ""} <p>{msg.text}</p>
+          <div key={idx} className="flex flex-row w-full gap-1 mb-1 text-sm">
+            <MessageBubble text={msg.text} sender={msg.senderId == player.id} senderName={msg.senderName} />
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
       <TextInput
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        }}
         placeholder="Type a message..."
       />
-      <Button text="Send" onClick={sendMessage} />
     </div>
   );
 }

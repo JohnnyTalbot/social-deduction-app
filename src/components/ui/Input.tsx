@@ -17,9 +17,10 @@ export function TextInput({ className, label, ...props }: InputProps) {
           borderRadius: '30px',
         }}
         type="text"
-        autoComplete="off"
         placeholder={props.placeholder || "Enter text..."}
         {...props}
+        name="disable-autofill"
+        autoComplete="off"
         />
     </div>
   )

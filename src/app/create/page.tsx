@@ -8,7 +8,7 @@ import { Room, Player, Seat } from '@/types/game';
 
 import Link from 'next/link';
 import { TextInput } from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
 function CreateRoom() {

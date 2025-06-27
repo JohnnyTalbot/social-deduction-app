@@ -11,6 +11,7 @@ import { usePresence } from "@/hooks/usePresence";
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
+import { Card, CardSide } from "@/components/ui/Card";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
 
@@ -75,16 +76,25 @@ function RoomPage() {
       />
       {playerData && roomData && (
         <>
-          <h1 className="absolute top-0">Room Code: {roomId}</h1>
-          <p>{playerData.name}</p>
-          <p>
-            {playerData.isStoryteller
-              ? "(Storyteller)"
-              : playerData.isSeated
-              ? "(Player)"
-              : "(Spectator)"}
-          </p>
-          <ChatBox roomId={roomData.id} player={playerData} />
+          <h1 className="text-5xl absolute top-0">Room Code: {roomId}</h1>
+          <div>
+            <p>{playerData.name}</p>
+            <p>
+              {playerData.isStoryteller
+                ? "(Storyteller)"
+                : playerData.isSeated
+                ? "(Player)"
+                : "(Spectator)"}
+            </p>
+          </div>
+          <CardSide 
+            icon={<svg width="35" height="34" viewBox="0 0 35 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5.25 0C2.35051 0 0 2.29237 0 5.12016V22.1874C0 25.0152 2.35051 27.3075 5.25 27.3075H18.8125L26.9068 33.6228C28.0526 34.5168 29.75 33.7212 29.75 32.2901V27.3075H30.6514C33.0531 27.3075 35 25.4088 35 23.0665V5.12016C35 2.29237 32.6495 0 29.75 0H5.25Z" fill="#51277D"/>
+                  </svg>}
+                  >
+            <ChatBox roomId={roomData.id} player={playerData} />
+          </CardSide>
+          
           <div className="absolute right-0 p-2 border-white border-2">
             {roomData.players &&
               Object.values(roomData.players)

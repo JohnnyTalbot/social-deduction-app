@@ -14,7 +14,7 @@ import { Player } from '@/types/game';
 
 import Link from 'next/link';
 import {TextInput} from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
 function JoinRoom() {
