@@ -6,10 +6,10 @@ type InputProps = {
 
 export function TextInput({ className, label, ...props }: InputProps) {
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${className}`}>
       {label ? <label>{label}</label> : ""}
       <input 
-        className={`px-5 py-2 focus:outline-none rounded bg-input placeholder:text-placeholder text-input ${className}`} 
+        className={`px-5 py-2 focus:outline-none rounded bg-input placeholder:text-placeholder text-input`} 
         style={{
           boxSizing: 'border-box',
           border: '3px solid #000000',
@@ -22,6 +22,7 @@ export function TextInput({ className, label, ...props }: InputProps) {
         name="disable-autofill"
         autoComplete="off"
         />
+      
     </div>
   )
 }
