@@ -17,64 +17,87 @@ export function Card({ children, className = '', ...props }: React.HTMLAttribute
   );
 }
 
+type CardSideProps = {
+  side?: 'left' | 'right';
+  open?: boolean;
+  icon?: React.ReactNode;
+  cardIndex?: number;
+  setOpenCard?: (index: number) => void;
+};
+
 export function CardSide(
-  { children, className = '', side = 'left', open = false, icon, ...props }:
-  { side?: 'left' | 'right', open?: boolean, icon?: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>
+  { children, className = '', side = 'left', cardIndex = 0, setOpenCard, open, icon, ...props }:
+  CardSideProps & React.HTMLAttributes<HTMLDivElement>
 ) {
-  const [isOpen, setIsOpen] = useState(open);
-  const [isHovering, setIsHovering] = useState(false)
-  const [maxHeight, setMaxHeight] = useState(open ? 'none' : '0px');
-  const [shouldRender, setShouldRender] = useState(open);
+  const isLinked = !!setOpenCard && cardIndex !== 0;
+
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = isLinked ? !!open : internalOpen;
+
+  const [isHovering, setIsHovering] = useState(false);
+  const [maxHeight, setMaxHeight] = useState(isOpen ? 'none' : '0px');
+  const [shouldRender, setShouldRender] = useState(isOpen);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const toggle = () => {
-    if (!isOpen) setShouldRender(true); // allow render before measuring
-    setIsOpen(!isOpen);
+    if (!isOpen) setShouldRender(true);
+
+    if (isLinked) {
+      setOpenCard?.(cardIndex);
+    } else {
+      setInternalOpen((prev) => !prev);
+    }
   };
 
   useEffect(() => {
     const content = contentRef.current;
 
     if (isOpen && content) {
-      // Wait for next tick to ensure DOM is painted
       requestAnimationFrame(() => {
         const scrollHeight = content.scrollHeight;
         setMaxHeight(`${scrollHeight}px`);
       });
     } else {
       setMaxHeight('0px');
-
-      // After collapse transition ends, hide content to prevent tabbing/focus
-      const timeout = setTimeout(() => setShouldRender(false), 500); // match transition duration
+      const timeout = setTimeout(() => setShouldRender(false), 500);
       return () => clearTimeout(timeout);
     }
   }, [isOpen, children]);
 
   return (
     <div
-      className={`absolute bg-card overflow-hidden transition-all duration-500 ease-in-out ${side === 'left' ? 'left-0' : 'right-0'} ${className}`}
+      className={`bg-card transition-all duration-500 ease-in-out ${className}`}
       style={{
         boxSizing: 'border-box',
-        border: '3px solid #000000',
-        boxShadow: '-5px 5px 0px #000000',
+        borderTop: '3px solid #000000',
+        borderBottom: '8px solid #000000',
+        borderLeft: side === 'right' ? '5px solid #000000' : 'none',
+        borderRight: side === 'left' ? '3px solid #000000' : 'none',
         borderBottomRightRadius: side === 'left' ? '30px' : '0',
         borderTopRightRadius: side === 'left' ? '30px' : '0',
         borderBottomLeftRadius: side === 'right' ? '30px' : '0',
         borderTopLeftRadius: side === 'right' ? '30px' : '0',
-        transform: !isOpen ? 
-          side === 'left' ? 
-          (isHovering ? 'translateX(-5px)' : 'translateX(-15px)') : 
-          (isHovering ? 'translateX(5px)' : 'translateX(15px)') : 'none',
+        padding: !isOpen
+          ? side === 'right'
+            ? isHovering ? '0 15px 0 0' : '0 5px 0 0'
+            : isHovering ? '0 0 0 15px' : '0 0 0 5px'
+          : 'none',
         maxWidth: isOpen ? '500px' : '100px',
-        transition: 'max-width 0.5s ease-in-out, transform 0.3s ease-in-out',
+        transition: 'max-width 0.5s ease-in-out, padding 0.3s ease-in-out',
       }}
       {...props}
     >
       {/* Toggle Button */}
       {isOpen ? (
         <div
-          className={`p-5 absolute top-0 ${side === 'left' ? 'right-0' : 'left-0'} cursor-pointer z-10`}
-          onClick={toggle}
+          className={`flex ${side === 'left' ? 'justify-end' : 'justify-start'} p-5 pb-0 cursor-pointer`}
+          onClick={() => {
+            if (isLinked) {
+              setOpenCard?.(0); // close all in the group
+            } else {
+              setInternalOpen(false); // close standalone
+            }
+          }}
         >
           <svg width="30" height="5" viewBox="0 0 30 5" fill="none">
             <path
@@ -87,7 +110,7 @@ export function CardSide(
         </div>
       ) : (
         <div
-          className="flex justify-end p-5 cursor-pointer w-full"
+          className={`flex ${side === 'left' ? 'justify-end' : 'justify-start'} p-5 cursor-pointer`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
           onClick={() => {
@@ -116,6 +139,7 @@ export function CardSide(
     </div>
   );
 }
+
 
 
 
