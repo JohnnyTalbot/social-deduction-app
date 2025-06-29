@@ -11,6 +11,7 @@ import { usePresence } from "@/hooks/usePresence";
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
+import CharacterSheet from "./CharacterSheet";
 import { Card, CardSide, CardPopup } from "@/components/ui/Card";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
@@ -208,7 +209,7 @@ function RoomPage() {
         </>
       )}
       <CardPopup title={"Character Reference Sheet"} open={openCharReference} setOpen={setOpenCharReference}>
-
+        <CharacterSheet />
       </CardPopup>
       <CardPopup title={"Night Reference Sheet"} open={openNightReference} setOpen={setOpenNightReference}>
 

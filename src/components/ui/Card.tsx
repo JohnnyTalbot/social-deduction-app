@@ -153,7 +153,7 @@ interface CardPopupProps {
 
 export function CardPopup({title='', open, setOpen, children, className = '', ...props }: CardPopupProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`${open ? '' : 'hidden'} absolute w-full h-screen flex justify-center items-center px-[200px] py-[50px]`}>
+    <div className={`${open ? '' : 'hidden'} absolute w-full h-screen flex justify-center items-center px-[50px] py-[50px]`}>
       <div 
         className="absolute w-full h-screen z-1"
         onClick={() => {
@@ -161,7 +161,7 @@ export function CardPopup({title='', open, setOpen, children, className = '', ..
           }}
       />
       <div
-        className={`w-full h-full bg-card p-5 z-2 ${className}`}
+        className={`w-full h-full bg-card p-5 pb-15 z-2 max-w-[1000px] ${className}`}
         style={{
           boxSizing: 'border-box',
           background: 'rgba(209, 187, 135, 0.7)',
