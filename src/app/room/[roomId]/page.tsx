@@ -11,7 +11,7 @@ import { usePresence } from "@/hooks/usePresence";
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
-import { Card, CardSide } from "@/components/ui/Card";
+import { Card, CardSide, CardPopup } from "@/components/ui/Card";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
 
@@ -20,6 +20,9 @@ function RoomPage() {
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [openCard, setOpenCard] = useState(0);
+  const [openCharReference, setOpenCharReference] = useState(false)
+  const [openNightReference, setOpenNightReference] = useState(false)
+  const [openHelp, setOpenHelp] = useState(false)
   const {
     roomData,
     playerData,
@@ -167,16 +170,52 @@ function RoomPage() {
                       <path fillRule="evenodd" clipRule="evenodd" d="M17.5 35C27.165 35 35 27.165 35 17.5C35 7.83502 27.165 0 17.5 0C7.83502 0 0 7.83502 0 17.5C0 27.165 7.83502 35 17.5 35ZM17.5 10.5C15.3377 10.5 14 12.1987 14 14C14 14.9665 13.2165 15.75 12.25 15.75C11.2835 15.75 10.5 14.9665 10.5 14C10.5 10.5513 13.131 7 17.5 7C21.869 7 24.5 10.5513 24.5 14C24.5 17.5821 21.7987 19.4947 20.9076 19.9402C20.7744 20.0068 20.6256 20.0701 20.5214 20.1144L20.475 20.1341C20.3708 20.1783 20.2749 20.219 20.1728 20.265C19.9405 20.3696 19.7391 20.4742 19.5737 20.5882C19.25 20.8112 19.25 20.9241 19.25 21C19.25 21.9665 18.4665 22.75 17.5 22.75C16.5335 22.75 15.75 21.9665 15.75 21C15.75 19.3259 16.7548 18.28 17.5881 17.7059C18.0017 17.421 18.418 17.2168 18.7358 17.0736C18.9703 16.968 19.0892 16.9192 19.1705 16.8858C19.2387 16.8578 19.2807 16.8406 19.3424 16.8098C19.4393 16.7613 19.8904 16.4804 20.3002 15.9658C20.688 15.4789 21 14.8356 21 14C21 12.1987 19.6623 10.5 17.5 10.5ZM17.5 26.25C16.5335 26.25 15.75 27.0335 15.75 28C15.75 28.9665 16.5335 29.75 17.5 29.75C18.4665 29.75 19.25 28.9665 19.25 28C19.25 27.0335 18.4665 26.25 17.5 26.25Z" fill="#51277D"/>
                     </svg>}
                     >
-              <div className="pl-5">
-                <p>Reference Sheet [R]</p>
-                <p>Night Order Sheet [N]</p>
-                <p>How to Play</p>
+              <div className="w-[200px] h-[150px] pl-5">
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => 
+                    {
+                      setOpenCharReference(true)
+                      setOpenCard(0)
+                    }}                  
+                  >
+                  <p>Reference Sheet [R]</p>
+                </div>
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => 
+                    {
+                      setOpenNightReference(true)
+                      setOpenCard(0)
+                    }}                  
+                  >
+                  <p>Night Order Sheet [N]</p>
+                </div>
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => 
+                    {
+                      setOpenHelp(true)
+                      setOpenCard(0)
+                    }}                  
+                  >
+                  <p>How to Play</p>
+                </div>
               </div>
                 
             </CardSide>
           </div>
         </>
       )}
+      <CardPopup title={"Character Reference Sheet"} open={openCharReference} setOpen={setOpenCharReference}>
+
+      </CardPopup>
+      <CardPopup title={"Night Reference Sheet"} open={openNightReference} setOpen={setOpenNightReference}>
+
+      </CardPopup>
+      <CardPopup title={"How to Play"} open={openHelp} setOpen={setOpenHelp}>
+
+      </CardPopup>
     </div>
   );
 }
