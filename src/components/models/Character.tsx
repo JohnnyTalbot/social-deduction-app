@@ -1,6 +1,6 @@
 import { useEffect, useRef, useLayoutEffect, useMemo } from 'react';
 import { useGLTF, Text } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 
@@ -30,7 +30,8 @@ export default function Character({ position, rotation, model, name }: Character
 
   const characterGroupRef = useRef<THREE.Group>(null);
   const armRef = useRef<THREE.Object3D | null>(null);
-
+  const textRef = useRef<THREE.Mesh>(null); // ⬅️ Text ref
+  const camera = useThree((state) => state.camera); // ⬅️ Access the camera
 
   // Use useLayoutEffect for finding the arm, as it relies on the actual mounted object
   // useLayoutEffect(() => {
@@ -53,6 +54,13 @@ export default function Character({ position, rotation, model, name }: Character
   //   }
   // });
 
+  // Make text always face the camera
+  useFrame(() => {
+    if (textRef.current) {
+      textRef.current.quaternion.copy(camera.quaternion);
+    }
+  });
+
   if (!clonedScene) return null;
 
   return (
@@ -62,11 +70,12 @@ export default function Character({ position, rotation, model, name }: Character
       rotation={rotation}
       key={`character-group-${model}-${name}`}
     >
-      <primitive object={clonedScene} scale={[3, 3, 3]} />
+      <primitive object={clonedScene} position={[0, 0, -0.4]} scale={[3, 3, 3]} />
 
       {name && (
         <Text
-          position={[0, 2.5, 0]}
+          ref={textRef}
+          position={[0, 2.5, -0.4]}
           fontSize={0.3}
           color="white"
           anchorX="center"
