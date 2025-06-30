@@ -11,6 +11,7 @@ import { usePresence } from "@/hooks/usePresence";
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
+import Dashboard from "./Dashboard";
 import CharacterSheet from "./CharacterSheet";
 import { Card, CardSide, CardPopup } from "@/components/ui/Card";
 import Loading from "@/components/Loading";
@@ -19,11 +20,15 @@ import ChatBox from "@/components/ChatBox";
 function RoomPage() {
   const router = useRouter();
   const { roomId } = useParams();
+
   const [loading, setLoading] = useState(true);
   const [openCard, setOpenCard] = useState(0);
-  const [openCharReference, setOpenCharReference] = useState(false)
-  const [openNightReference, setOpenNightReference] = useState(false)
-  const [openHelp, setOpenHelp] = useState(false)
+  const [openCharReference, setOpenCharReference] = useState(false);
+  const [openNightReference, setOpenNightReference] = useState(false);
+  const [openHelp, setOpenHelp] = useState(false);
+  const [openAssigns, setOpenAssigns] = useState(false);
+  const [showRoles, setShowRoles] = useState(false);
+
   const {
     roomData,
     playerData,
@@ -70,7 +75,7 @@ function RoomPage() {
   if (loading) return <Loading />;
 
   return (
-    <div className="flex flex-col justify-center items-center w-full h-screen overflow-x-hidden">
+    <div className="flex flex-col justify-center items-center w-full h-screen">
       {playerData?.isStoryteller && <PresenceWatcher roomId={roomId as string} />}
       <ModelPreload />
       <GameArea
@@ -82,7 +87,7 @@ function RoomPage() {
       {playerData && roomData && (
         <>
           <h1 className="text-5xl absolute top-0">Room Code: {roomId}</h1>
-          <div>
+          <div className="flex flex-col justify-center items-center">
             <p>{playerData.name}</p>
             <p>
               {playerData.isStoryteller
@@ -91,6 +96,14 @@ function RoomPage() {
                 ? "(Player)"
                 : "(Spectator)"}
             </p>
+            <Dashboard 
+              roomData={roomData} 
+              updateRoomData={updateRoomData} 
+              isStoryteller={playerData.isStoryteller}
+              showRoles={showRoles}
+              setShowRoles={setShowRoles}
+              setOpenAssigns={setOpenAssigns}
+            />
           </div>
 
           <div className="flex flex-col items-start h-auto w-auto absolute left-0 mt-auto mb-auto">
@@ -215,6 +228,9 @@ function RoomPage() {
 
       </CardPopup>
       <CardPopup title={"How to Play"} open={openHelp} setOpen={setOpenHelp}>
+
+      </CardPopup>
+      <CardPopup title={"Choose & Assign Roles"} open={openAssigns} setOpen={setOpenAssigns}>
 
       </CardPopup>
     </div>

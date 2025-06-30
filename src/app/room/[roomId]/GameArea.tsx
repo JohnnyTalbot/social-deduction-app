@@ -21,11 +21,12 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
   const count = 12; // number of objects in the circle
   const angleOffset = 0; // rotate the entire circle if needed
 
-  const handleSeatedClick = (seat: Seat) => {
-    if (!playerData || !roomData) return;
+  if (!playerData || !roomData) return;
 
-    const player =  playerData as Player;
-    const room = roomData as Room;
+  const player =  playerData as Player;
+  const room = roomData as Room;
+
+  const handleSeatedClick = (seat: Seat) => {
 
     if (player.isStoryteller) {
       alert("Storyteller cannot seat themselves");
@@ -55,8 +56,8 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
 
   return (
     <Canvas camera={{ position: [-5, 4, 4] }}>
-      <ambientLight intensity={0.5} />
-      <directionalLight color={"yellow"} position={[0, 20, 0]} />
+      <ambientLight intensity={room.currentPhase != "night" ? 0.5 : 0.2} />
+      {room.currentPhase != "night" && <directionalLight color={"yellow"} position={[0, 20, 0]} />}
       <Table />
       <OrbitControls />
 
