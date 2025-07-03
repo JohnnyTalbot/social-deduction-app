@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 
 interface CardProps {
-  bg?: string;
+  bgColor?: string;
+  padding?: string;
 }
 
-export function Card({ children, className = '', bg="#F3ECDC", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ children, className = '', bgColor="#F3ECDC", padding="20px", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`p-5 bg-${bg} ${className}`}
+      className={`${className}`}
       style={{
         boxSizing: 'border-box',
         border: '3px solid #000000',
         boxShadow: '-5px 5px 0px #000000',
         borderRadius: '30px',
+        padding: padding,
+        backgroundColor: bgColor,
       }}
       {...props}
     >
