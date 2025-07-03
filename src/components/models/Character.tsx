@@ -30,8 +30,8 @@ export default function Character({ position, rotation, model, name }: Character
 
   const characterGroupRef = useRef<THREE.Group>(null);
   const armRef = useRef<THREE.Object3D | null>(null);
-  const textRef = useRef<THREE.Mesh>(null); // ⬅️ Text ref
-  const camera = useThree((state) => state.camera); // ⬅️ Access the camera
+  const textRef = useRef<THREE.Mesh>(null);
+  const camera = useThree((state) => state.camera);
 
   // Use useLayoutEffect for finding the arm, as it relies on the actual mounted object
   // useLayoutEffect(() => {
