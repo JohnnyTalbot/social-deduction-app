@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { get, ref, onValue } from "firebase/database";
 import { db } from "@/lib/firebase";
-import { Room, Player } from "@/types/game";
+import { Room, Player, Role } from "@/types/game";
 import { useRoomSync } from "@/hooks/useRoomSync";
 import { usePresence } from "@/hooks/usePresence";
 
@@ -32,6 +32,7 @@ function RoomPage() {
   const [openNightReference, setOpenNightReference] = useState(false);
   const [openHelp, setOpenHelp] = useState(false);
   const [openAssigns, setOpenAssigns] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
   const [showRoles, setShowRoles] = useState(false);
 
   const {
@@ -236,7 +237,7 @@ function RoomPage() {
 
       </CardPopup>
       <CardPopup title={"Choose & Assign Roles"} open={openAssigns} setOpen={setOpenAssigns}>
-        <AssignRoles script={DefaultScript} />
+        <AssignRoles script={DefaultScript} setSelectedRoles={setSelectedRoles} selectedRoles={selectedRoles} />
       </CardPopup>
     </div>
   );
