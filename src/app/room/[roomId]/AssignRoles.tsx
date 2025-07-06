@@ -1,5 +1,8 @@
 import Image from 'next/image';
+import { useState } from 'react';
+
 import { Card } from '@/components/ui/Card';
+import { Tooltip } from '@/components/Tooltip';
 
 import { Script } from '@/types/game';
 
@@ -8,6 +11,26 @@ interface AssignRolesProps{
 }
 
 function AssignRoles({script} : AssignRolesProps){
+  const [tooltip, setTooltip] = useState({
+    x: 0,
+    y: 0,
+    content: '',
+    visible: false
+  });
+
+  const handleMouseMove = (e: React.MouseEvent, content: string) => {
+    setTooltip({
+      x: e.clientX,
+      y: e.clientY,
+      content,
+      visible: true
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip(prev => ({ ...prev, visible: false }));
+  };
+
   return(
     <div className="w-full h-full flex flex-col pr-3 custom-scrollbar overflow-y-scroll">
       {Object.entries(script.roleList).map(([type, value]) => (
@@ -22,21 +45,24 @@ function AssignRoles({script} : AssignRolesProps){
           </svg>
           <div className="flex flex-wrap w-full text-2xl gap-5 p-5">
             {value.roles.map((char, index) => (
-              <Card 
+              <Card
                 key={index}
-                className="flex flex-col justify-center items-center w-[120px] h-[120px]"
+                onMouseMove={(e) => handleMouseMove(e,( char.description || ''))}
+                onMouseLeave={handleMouseLeave}
+                className="flex flex-col justify-center items-center w-[120px] h-[120px] relative cursor-pointer"
                 bgColor={value.color}
                 padding="5px"
-                >
-                <Image 
-                  width={75} 
-                  height={75} 
-                  alt={`${char.name}`} 
-                  src={`/assets/${char.name.toLowerCase()}.png`} 
+              >
+                <Image
+                  width={75}
+                  height={75}
+                  alt={`${char.name}`}
+                  src={`/assets/${char.name.toLowerCase()}.png`}
                 />
                 <p className="text-lg text-center text-black">{char.name}</p>
               </Card>
             ))}
+            <Tooltip x={tooltip.x} y={tooltip.y} content={tooltip.content} visible={tooltip.visible} />
           </div>
         </div>
       ))}
