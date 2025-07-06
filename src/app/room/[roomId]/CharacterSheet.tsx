@@ -4,7 +4,7 @@ export default function CharacterSheet() {
   return(
     <div className="w-full h-full flex flex-col pr-3 custom-scrollbar overflow-y-scroll">
       {
-        Object.entries(DefaultScript).map(([type, value]) => (
+        Object.entries(DefaultScript.roleList).map(([type, value]) => (
           <div className="py-2" key={type}>
             <p className="text-3xl">{type}</p>
             <svg className="w-full h-[7px]"
@@ -16,7 +16,7 @@ export default function CharacterSheet() {
             </svg>
             <div className="flex flex-wrap w-full text-2xl">
               {value.roles.map((char, index) => (
-                <Role key={index} name={char.name} description={char.description} />
+                <Role key={index} name={char.name} description={char.description || ''} />
               ))}
             </div>
           </div>

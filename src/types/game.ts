@@ -20,6 +20,19 @@ export interface Message {
   timestamp: number;
 }
 
+export interface Script {
+  name: string;
+  description?: string;
+  roleList: {[name: string] : RoleType}
+}
+
+export interface RoleType {
+  name: string;
+  description?: string;
+  color: string;
+  roles: Role[];
+}
+
 export interface Role {
   name: string;
   type: string;
