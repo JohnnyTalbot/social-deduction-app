@@ -50,6 +50,7 @@ function JoinRoom() {
         isStoryteller: false,
         isSeated: false,
         model: models[selectedModel],
+        loadState: "loading"
       }
 
       const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);

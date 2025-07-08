@@ -5,7 +5,7 @@ interface CardProps {
   padding?: string;
 }
 
-export function Card({ children, className = '', bgColor="#F3ECDC", padding="20px", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ children, className = '', bgColor="#D1BB87", padding="20px", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={`${className}`}

@@ -29,9 +29,9 @@ export function usePresence(roomId: string, playerId: string, playerData?: Playe
     });
 
     const unsubscribePresence = onValue(allTabsRef, async (snapshot) => {
-      console.log("Presence snapshot:", snapshot.val());
       const isOnline = snapshot.exists();
       const updates: Record<string, any> = {
+        loadState: isOnline ? "ready" : "offline",
         state: isOnline ? "online" : "offline",
         last_changed: Date.now(),
       };

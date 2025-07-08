@@ -22,7 +22,7 @@ export function usePresenceWatcher(roomId: string) {
         const isOnline = Object.keys(presence).length > 0;
 
         // If player is offline, update their state and unseat them
-        if (!isOnline && player.state !== 'offline') {
+        if (!isOnline && player.state && player.state !== 'offline') {
           const updates: Record<string, any> = {
             [`rooms/${roomId}/players/${playerId}/state`]: 'offline',
             [`rooms/${roomId}/players/${playerId}/last_changed`]: Date.now(),
@@ -38,7 +38,7 @@ export function usePresenceWatcher(roomId: string) {
             updates[`rooms/${roomId}/seats/${seatIndex}/playerId`] = '';
           }
 
-          console.log(`🛑 Player ${playerId} is now offline and has been unseated.`);
+          console.log(`Player ${playerId} is now offline and has been unseated.`);
           update(ref(db), updates);
         }
       });
