@@ -4,6 +4,8 @@
   --color-bg: #FBEC8C;
   --card-bg: #D1BB87;
   --text-primary: #7B5D4E;
+  --warning: #F54242;
+  --success: #6AC26D;
 }
 
 html, body{
@@ -79,6 +81,14 @@ svg:focus {
 
 .text-input{
   color: #7B5D4E;
+}
+
+.text-warning{
+  color: var(--warning);
+}
+
+.text-succuess{
+  color: var(--success);
 }
 
 .bg-input{

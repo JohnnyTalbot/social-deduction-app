@@ -39,6 +39,7 @@ function JoinRoom() {
       const snapshot = await get(roomRef);
 
       if (!snapshot.exists()) {
+        setIsEntering(false);
         alert("Room not found!");
         return;
       }

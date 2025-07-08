@@ -24,6 +24,8 @@ export interface Message {
 export interface Script {
   name: string;
   description?: string;
+  minimum: number;
+  numberTable: {[players: number ]: number[]};
   roleList: {[name: string] : RoleType}
 }
 

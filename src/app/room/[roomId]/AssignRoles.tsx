@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Card } from '@/components/ui/Card';
 import { Tooltip } from '@/components/Tooltip';
@@ -10,15 +10,27 @@ interface AssignRolesProps{
   script: Script;
   selectedRoles: Role[];
   setSelectedRoles: (roles: Role[]) => void;
+  totalPlayers: number;
 }
 
-function AssignRoles({script, selectedRoles, setSelectedRoles} : AssignRolesProps){
+function AssignRoles({script, selectedRoles, setSelectedRoles, totalPlayers} : AssignRolesProps){
+  const [isEnough, setIsEnough] = useState(false)
+
   const [tooltip, setTooltip] = useState({
     x: 0,
     y: 0,
     content: '',
     visible: false
   });
+
+  useEffect(() => {
+    setIsEnough(totalPlayers >= script.minimum)
+
+    if(!isEnough){
+      setSelectedRoles([])
+    }
+  }, [totalPlayers])
+  
 
   const handleMouseMove = (e: React.MouseEvent, content: string) => {
     setTooltip({
@@ -34,6 +46,8 @@ function AssignRoles({script, selectedRoles, setSelectedRoles} : AssignRolesProp
   };
 
   const toggleRoleSelect = (role: Role) => {
+    if(!isEnough) return;
+
     const isSelected = selectedRoles.some(r => r.name === role.name);
 
     if (isSelected) {
@@ -45,11 +59,15 @@ function AssignRoles({script, selectedRoles, setSelectedRoles} : AssignRolesProp
 
   return(
     <div className="w-full h-full flex flex-col pr-3 custom-scrollbar overflow-y-scroll">
-      {Object.entries(script.roleList).map(([type, value]) => (
+      <div className='flex flex-row gap-3'>
+        <p className="text-3xl text-[#9247E3]">Total Players : {totalPlayers}</p>
+        {!isEnough && <p className="text-3xl text-warning">Not enough players!</p>}
+      </div>
+      {Object.entries(script.roleList).map(([type, value], index) => (
         <div className="py-2" key={type}>
           <div className='flex flex-row gap-5'>
             <p className="text-3xl">{type}</p>
-            <p className="text-3xl">{selectedRoles.filter(r => r.type == type.toLowerCase()).length}</p>
+            <p className="text-3xl">{selectedRoles.filter(r => r.type == type.toLowerCase()).length} / {isEnough && script.numberTable[totalPlayers] ? script.numberTable[totalPlayers][index] : 0}</p>
           </div>
           <svg className="w-full h-[7px]"
                 viewBox="0 0 1029 7"

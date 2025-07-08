@@ -8,7 +8,7 @@ import { Room, Player, Role } from "@/types/game";
 import { useRoomSync } from "@/hooks/useRoomSync";
 import { usePresence } from "@/hooks/usePresence";
 
-import { DefaultScript } from "@/data/Scripts";
+import { TroubleBrewing } from "@/data/Scripts";
 
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
@@ -237,7 +237,11 @@ function RoomPage() {
 
       </CardPopup>
       <CardPopup title={"Choose & Assign Roles"} open={openAssigns} setOpen={setOpenAssigns}>
-        <AssignRoles script={DefaultScript} setSelectedRoles={setSelectedRoles} selectedRoles={selectedRoles} />
+        <AssignRoles 
+          script={TroubleBrewing} 
+          setSelectedRoles={setSelectedRoles} 
+          selectedRoles={selectedRoles} 
+          totalPlayers={roomData ? Object.values(roomData.players).filter((player) => player.isSeated).length : 0} />
       </CardPopup>
     </div>
   );

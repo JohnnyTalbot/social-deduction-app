@@ -1,10 +1,10 @@
-import { DefaultScript } from "@/data/Scripts";
+import { TroubleBrewing } from "@/data/Scripts";
 
 export default function CharacterSheet() {
   return(
     <div className="w-full h-full flex flex-col pr-3 custom-scrollbar overflow-y-scroll">
       {
-        Object.entries(DefaultScript.roleList).map(([type, value]) => (
+        Object.entries(TroubleBrewing.roleList).map(([type, value]) => (
           <div className="py-2" key={type}>
             <p className="text-3xl">{type}</p>
             <svg className="w-full h-[7px]"
