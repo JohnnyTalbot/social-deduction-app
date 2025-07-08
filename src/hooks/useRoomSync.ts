@@ -22,6 +22,13 @@ export function useRoomSync(roomId: string) {
     setPlayerData({ ...playerData, ...partial });
   };
 
+  const updatePlayerById = (playerId: string, partial: Partial<Player>) => {
+    if (!roomId || !playerId) return;
+
+    const playerRef = ref(db, `rooms/${roomId}/players/${playerId}`);
+    update(playerRef, partial);
+  };
+
   useEffect(() => {
     if (!roomData || !isLocalRoomUpdate.current) return;
     update(ref(db, `rooms/${roomId}`), roomData);
@@ -57,6 +64,7 @@ export function useRoomSync(roomId: string) {
     setRoomData,
     setPlayerData,
     updateRoomData,
-    updatePlayerData
+    updatePlayerData,
+    updatePlayerById
   };
 }

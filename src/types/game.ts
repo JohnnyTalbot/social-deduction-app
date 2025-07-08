@@ -9,7 +9,7 @@ export interface Player {
   seatNumber?: number;
   loadState?: "loading" | "ready" | "offline";
   state?: "online" | "offline",
-  role?: string; // Assigned by AI or storyteller
+  role?: string;
   last_changed?: number;
 }
 

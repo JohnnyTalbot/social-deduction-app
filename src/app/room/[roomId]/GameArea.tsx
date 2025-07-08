@@ -83,6 +83,7 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
             rotation={[0, CharacterRotationY, 0]}
             model={(roomData as Room).players[seat.playerId || '']?.model || 'male-a'}
             name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
+            playerData={(roomData as Room).players[seat.playerId || '']}
           />
           :
           <Plus
