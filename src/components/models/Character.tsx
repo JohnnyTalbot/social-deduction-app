@@ -5,7 +5,11 @@ import * as THREE from 'three';
 import { TextureLoader } from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 
-import { Player } from '@/types/game';
+import { useClonedGLTF } from '@/hooks/useClonedGLTF';
+import { useCharacterAnimator } from '@/hooks/useCharacterAnimator';
+
+import { Player, Room } from '@/types/game';
+import { update } from 'firebase/database';
 
 interface CharacterProps {
   position: [number, number, number];
@@ -13,33 +17,49 @@ interface CharacterProps {
   model: string;
   name?: string;
   playerData?: Player;
+  updatePlayerById?: (playerId: string, partial: Partial<Player>) => void;
+  roomData?: Room;
   setSelectedCharacter?: (character: Player) => void;
   setOpenCharacter?: (open: boolean) => void;
 }
 
-export default function Character({ position, rotation, model, name, playerData, setSelectedCharacter, setOpenCharacter }: CharacterProps) {
+export default function Character({ position, rotation, model, name, playerData, updatePlayerById, roomData, setSelectedCharacter, setOpenCharacter }: CharacterProps) {
   const modelPath = `/models/kenney/character-${model}.glb`;
-  const { scene } = useGLTF(modelPath);
 
   const [charHover, setCharHover] = useState(false)
 
-  // SkeletonUtils.clone to create a stable, deep clone
-  const clonedScene = useMemo(() => {
-    if (!scene) return null;
-    const cloned = SkeletonUtils.clone(scene);
-    // Important: Reset position/rotation/scale on the cloned object itself
-    // as SkeletonUtils.clone might preserve original model transforms.
-    cloned.position.set(0, 0, 0);
-    cloned.rotation.set(0, 0, 0);
-    cloned.scale.set(1, 1, 1); // Reset to 1,1,1 as group will handle overall scale
-
-    return cloned;
-  }, [scene, modelPath, name]); // Re-clone only if scene or modelPath changes
+  const { scene: clonedScene, animations } = useClonedGLTF(modelPath);
 
   const characterGroupRef = useRef<THREE.Group>(null);
   const armRef = useRef<THREE.Object3D | null>(null);
   const textRef = useRef<THREE.Mesh>(null);
   const camera = useThree((state) => state.camera);
+  const [isSceneReady, setIsSceneReady] = useState(false);
+
+  const { playAnimation } = useCharacterAnimator(clonedScene, animations, playerData?.id, updatePlayerById);
+
+  useEffect(() => {
+    if (clonedScene) {
+      setIsSceneReady(true);
+    }
+  }, [clonedScene]);
+
+  useEffect(() => {
+    playAnimation('idle', {fadeDuration: 1});
+  }, [playAnimation]);
+
+  const lastAnimationRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isSceneReady || !playerData?.isAnimating || !playerData.currentAnimation) return;
+
+    // Optional: prevent triggering same animation repeatedly
+    // if (lastAnimationRef.current === playerData.currentAnimation) return;
+    lastAnimationRef.current = playerData.currentAnimation;
+
+    playAnimation(playerData.currentAnimation, { loopOnce: true });
+  }, [playerData?.isAnimating, playerData?.currentAnimation, playAnimation, isSceneReady]);
+
 
   // Use useLayoutEffect for finding the arm, as it relies on the actual mounted object
   // useLayoutEffect(() => {
@@ -92,6 +112,7 @@ export default function Character({ position, rotation, model, name, playerData,
             setSelectedCharacter(playerData)
             setOpenCharacter(true)
             setCharHover(false)
+            playAnimation('emote-yes', {loopOnce: true, fadeDuration: 2})
           }
         }} 
         object={clonedScene} 
@@ -99,7 +120,9 @@ export default function Character({ position, rotation, model, name, playerData,
         scale={[3, 3, 3]} />
 
       
-      {playerData && charHover && <Highlight />}
+      {playerData && <Highlight visible={charHover} />}
+
+      {playerData && playerData?.id == roomData?.currentNominated && <Banner />}
 
       {name && (
         <Text
@@ -147,8 +170,21 @@ function ImageCard({ url = '', width = 1.5, height = 1.5 }) {
   );
 }
 
-function Highlight() {
-  const { scene } = useGLTF(`/models/kenney/indicator-square-b.glb`);
-  return <primitive scale={[1.2, 1.2, 1.2]} object={scene} />;
+function Highlight({visible=false}) {
+  const { scene: clonedScene } = useClonedGLTF(`/models/kenney/indicator-square-b.glb`);
+
+  return <primitive visible={visible} object={clonedScene} scale={[1.2, 1.2, 1.2]} />;
+}
+
+function Banner() {
+  const { scene: clonedScene } = useClonedGLTF(`/models/kenney/banner.glb`);
+
+  return (
+    <primitive
+      object={clonedScene}
+      position={[0, 1, 1.7]}
+      scale={[2, 2, 2]}
+    />
+  );
 }
 

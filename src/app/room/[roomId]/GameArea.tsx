@@ -12,12 +12,13 @@ interface GameAreaProps {
   roomData: Room | unknown;
   playerData: Player | unknown;
   updatePlayerData: (partial: Partial<Player>) => void;
+  updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
   updateRoomData: (partial: Partial<Room>) => void;
   setSelectedCharacter: (character: Player) => void;
   setOpenCharacter: (open: boolean) => void;
 }
 
-function GameArea({ roomData, playerData, updatePlayerData, updateRoomData, setSelectedCharacter, setOpenCharacter }: GameAreaProps) {
+function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, updateRoomData, setSelectedCharacter, setOpenCharacter }: GameAreaProps) {
   const radius = 5;
   const center = new THREE.Vector3(0, 1.2, 0);
   const count = 12; // number of objects in the circle
@@ -51,7 +52,10 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData, setS
     updateRoomData({
       seats: updatedSeats
     });
-    updatePlayerData({ seatNumber: seat.number, isSeated: true });
+    updatePlayerData({ 
+      seatNumber: seat.number,
+      isSeated: true
+      });
   };
 
   if (!roomData || !playerData) return null;
@@ -77,6 +81,11 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData, setS
         const CharacterRotationY = Math.atan2(lookAtVector.x, lookAtVector.z)
         const PlusRotationY = Math.atan2(lookAtVector.x, lookAtVector.z) + Math.PI / 2;
 
+        const rawPlayer = room.players[seat.playerId || ''];
+
+        const playerForSeat = rawPlayer ? { ...rawPlayer } : undefined;
+
+
         return (
           seat.isTaken ?
           <Character
@@ -85,7 +94,9 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData, setS
             rotation={[0, CharacterRotationY, 0]}
             model={(roomData as Room).players[seat.playerId || '']?.model || 'male-a'}
             name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
-            playerData={(roomData as Room).players[seat.playerId || '']}
+            playerData={playerForSeat}
+            updatePlayerById={updatePlayerById}
+            roomData={roomData as Room}
             setSelectedCharacter={setSelectedCharacter}
             setOpenCharacter={setOpenCharacter}
           />

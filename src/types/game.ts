@@ -11,6 +11,8 @@ export interface Player {
   state?: "online" | "offline",
   role?: string;
   last_changed?: number;
+  isAnimating?: boolean;
+  currentAnimation?: string;
 }
 
 export interface Message {
@@ -61,4 +63,5 @@ export interface Room {
   currentPhase: "day" | "night" | "voting" | "setup";
   // Store generated roles if needed
   generatedRoles?: Role[];
+  currentNominated?: string; // Player Id
 }
