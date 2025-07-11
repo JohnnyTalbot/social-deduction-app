@@ -13,10 +13,12 @@ interface GameAreaProps {
   playerData: Player | unknown;
   updatePlayerData: (partial: Partial<Player>) => void;
   updateRoomData: (partial: Partial<Room>) => void;
+  setSelectedCharacter: (character: Player) => void;
+  setOpenCharacter: (open: boolean) => void;
 }
 
-function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: GameAreaProps) {
-  const radius = 4.3;
+function GameArea({ roomData, playerData, updatePlayerData, updateRoomData, setSelectedCharacter, setOpenCharacter }: GameAreaProps) {
+  const radius = 5;
   const center = new THREE.Vector3(0, 1.2, 0);
   const count = 12; // number of objects in the circle
   const angleOffset = 0; // rotate the entire circle if needed
@@ -84,13 +86,18 @@ function GameArea({ roomData, playerData, updatePlayerData, updateRoomData }: Ga
             model={(roomData as Room).players[seat.playerId || '']?.model || 'male-a'}
             name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
             playerData={(roomData as Room).players[seat.playerId || '']}
+            setSelectedCharacter={setSelectedCharacter}
+            setOpenCharacter={setOpenCharacter}
           />
           :
           <Plus
             key={`seat-${seat.number}`}
             position={[x, y, z]}
             rotation={[0, PlusRotationY, 0]}
-            onClick={() => handleSeatedClick(seat)}
+            onClick={() => {
+              handleSeatedClick(seat)
+              document.body.style.cursor = 'default'
+            }}
           />
         )
       })}

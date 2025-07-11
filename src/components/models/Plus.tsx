@@ -20,10 +20,10 @@ function Plus({position, rotation, ...props}: PlusProps) {
       {...props}
     >
       <Box args={[0.1, 0.35, 0.1]}>
-        <meshStandardMaterial color="green" emissive="green" />
+        <meshStandardMaterial color="#6AC26D" />
       </Box>
       <Box args={[0.1, 0.1, 0.35]}>
-        <meshStandardMaterial color="green" emissive="green" />
+        <meshStandardMaterial color="#6AC26D" />
       </Box>
     </mesh>
   )

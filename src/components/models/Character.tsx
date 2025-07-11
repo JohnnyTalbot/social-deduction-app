@@ -1,4 +1,4 @@
-import { useEffect, useRef, useLayoutEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
 import { useGLTF, Text } from '@react-three/drei';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,11 +13,15 @@ interface CharacterProps {
   model: string;
   name?: string;
   playerData?: Player;
+  setSelectedCharacter?: (character: Player) => void;
+  setOpenCharacter?: (open: boolean) => void;
 }
 
-export default function Character({ position, rotation, model, name, playerData }: CharacterProps) {
-  const modelPath = `/models/characters/character-${model}.glb`;
+export default function Character({ position, rotation, model, name, playerData, setSelectedCharacter, setOpenCharacter }: CharacterProps) {
+  const modelPath = `/models/kenney/character-${model}.glb`;
   const { scene } = useGLTF(modelPath);
+
+  const [charHover, setCharHover] = useState(false)
 
   // SkeletonUtils.clone to create a stable, deep clone
   const clonedScene = useMemo(() => {
@@ -80,12 +84,27 @@ export default function Character({ position, rotation, model, name, playerData 
       rotation={rotation}
       key={`character-group-${model}-${name}`}
     >
-      <primitive object={clonedScene} position={[0, 0, -0.4]} scale={[3, 3, 3]} />
+      <primitive 
+        onPointerOver={() => setCharHover(true)}
+        onPointerOut={() => setCharHover(false)}
+        onClick={() => {
+          if(setSelectedCharacter && setOpenCharacter && playerData){
+            setSelectedCharacter(playerData)
+            setOpenCharacter(true)
+            setCharHover(false)
+          }
+        }} 
+        object={clonedScene} 
+        position={[0, 0, 0]} 
+        scale={[3, 3, 3]} />
+
+      
+      {playerData && charHover && <Highlight />}
 
       {name && (
         <Text
           ref={textRef}
-          position={[0, 2.5, -0.4]}
+          position={[0, 2.5, 0]}
           fontSize={0.3}
           color="white"
           anchorX="center"
@@ -97,7 +116,7 @@ export default function Character({ position, rotation, model, name, playerData 
         </Text>
       )}
       {
-        playerData && (
+        playerData && playerData.role && (
           <ImageCard url={`/assets/${playerData.role}.png`} />
         )
       }
@@ -121,9 +140,15 @@ function ImageCard({ url = '', width = 1.5, height = 1.5 }) {
   });
 
   return (
-    <mesh ref={meshRef} position={[0, 3.5, -0.5]}>
+    <mesh ref={meshRef} position={[0, 3.5, 0]}>
       <planeGeometry args={[width, height]} />
       <meshBasicMaterial map={texture} transparent />
     </mesh>
   );
 }
+
+function Highlight() {
+  const { scene } = useGLTF(`/models/kenney/indicator-square-b.glb`);
+  return <primitive scale={[1.2, 1.2, 1.2]} object={scene} />;
+}
+
