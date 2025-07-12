@@ -45,12 +45,15 @@ function RoomPage() {
     setPlayerData,
     updateRoomData,
     updatePlayerData,
-    updatePlayerById
+    updatePlayerById,
+    handleKickPlayer
   } = useRoomSync(roomId as string);
 
   const seatedPlayers = roomData
     ? Object.values(roomData.players).filter(player => player.isSeated)
     : [];
+
+  const currentPlayer = playerData as Player;
 
 
   useEffect(() => {
@@ -164,27 +167,47 @@ function RoomPage() {
                         : player.isSeated
                         ? <div className="flex flex-row items-center justify-between">
                             <p className="text-[#51277D]">{player.name}{" "}(Player){player.role ? player.role : "unassigned"}</p>
+                            {
+                            currentPlayer.isStoryteller &&
                             <div className="flex flex-row justify-center items-center gap-2">
-                              <svg className="cursor-pointer" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <svg 
+                                onClick={() => {
+                                  setSelectedCharacter(player)
+                                  setOpenCharacter(true)
+                                }}
+                                className="cursor-pointer" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" clipRule="evenodd" d="M6.29446 1.90909C6.29446 0.854729 7.12397 0 8.14723 0H11.8528C12.876 0 13.7055 0.854729 13.7055 1.90909V2.80209C14.021 2.96361 14.3251 3.1451 14.6163 3.34497L15.3678 2.89789C16.2539 2.37071 17.3871 2.68357 17.8987 3.59667L19.7515 6.90331C20.2631 7.81642 19.9595 8.984 19.0733 9.51118L18.3212 9.95862C18.332 10.1377 18.3375 10.3182 18.3375 10.5C18.3375 10.6819 18.332 10.8624 18.3212 11.0415L19.0731 11.4888C19.9593 12.016 20.2629 13.1836 19.7513 14.0967L17.8985 17.4033C17.3869 18.3164 16.2538 18.6293 15.3676 18.1021L14.6162 17.6551C14.325 17.8549 14.0209 18.0364 13.7055 18.1979V19.0909C13.7055 20.1453 12.876 21 11.8528 21H8.14723C7.12397 21 6.29446 20.1453 6.29446 19.0909V18.1979C5.97906 18.0364 5.67499 17.8549 5.38381 17.6551L4.6324 18.1021C3.74623 18.6293 2.61309 18.3164 2.10147 17.4033L0.248697 14.0967C-0.262931 13.1836 0.0406917 12.016 0.926858 11.4888L1.67883 11.0415C1.66802 10.8624 1.66254 10.6819 1.66254 10.5C1.66254 10.3182 1.66802 10.1377 1.67882 9.95864L0.926694 9.5112C0.0405279 8.98402 -0.263095 7.81643 0.248534 6.90333L2.1013 3.59669C2.61293 2.68358 3.74607 2.37073 4.63223 2.89791L5.38373 3.34498C5.67493 3.14511 5.97903 2.96361 6.29446 2.80209V1.90909ZM10.0003 15.2727C12.5584 15.2727 14.6322 13.1359 14.6322 10.5C14.6322 7.8641 12.5584 5.72727 10.0003 5.72727C7.44211 5.72727 5.36833 7.8641 5.36833 10.5C5.36833 13.1359 7.44211 15.2727 10.0003 15.2727Z" fill="#565656"/>
                                 <path d="M12.7794 10.5C12.7794 12.0815 11.5351 13.3636 10.0003 13.3636C8.46537 13.3636 7.2211 12.0815 7.2211 10.5C7.2211 8.91846 8.46537 7.63636 10.0003 7.63636C11.5351 7.63636 12.7794 8.91846 12.7794 10.5Z" fill="#565656"/>
                               </svg>
-                              <svg className="cursor-pointer" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <svg
+                                onClick={() => handleKickPlayer(player)} 
+                                className="cursor-pointer" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" clipRule="evenodd" d="M0.389165 0.396985C0.907962 -0.119475 1.74899 -0.119372 2.26766 0.397215L7.46409 5.56937L12.6671 0.387816C13.1856 -0.128942 14.0266 -0.12932 14.5456 0.386971C15.0646 0.903261 15.0649 1.74071 14.5464 2.25747L9.34236 7.4401L14.6111 12.7422C15.1297 13.2588 15.1296 14.0963 14.6108 14.6127C14.092 15.1292 13.251 15.1291 12.7323 14.6125L7.46471 9.31145L2.31188 14.5723C1.79338 15.089 0.95235 15.0894 0.433382 14.5731C-0.0855855 14.0568 -0.0859656 13.2194 0.432533 12.7026L5.58644 7.44072L0.388934 2.26748C-0.129735 1.7509 -0.129632 0.913446 0.389165 0.396985Z" fill="#F54242"/>
                               </svg>
                             </div>
+                            }
                           </div>
                         : <div className="flex flex-row items-center justify-between">
                             <p className="opacity-50">{player.name}{" "}Spectator)</p>
-                            <div className="flex flex-row items-center gap-2">
-                              <svg className="cursor-pointer" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            {
+                            currentPlayer.isStoryteller &&
+                            <div className="flex flex-row justify-center items-center gap-2">
+                              <svg 
+                                onClick={() => {
+                                  setSelectedCharacter(player)
+                                  setOpenCharacter(true)
+                                }}
+                                className="cursor-pointer" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" clipRule="evenodd" d="M6.29446 1.90909C6.29446 0.854729 7.12397 0 8.14723 0H11.8528C12.876 0 13.7055 0.854729 13.7055 1.90909V2.80209C14.021 2.96361 14.3251 3.1451 14.6163 3.34497L15.3678 2.89789C16.2539 2.37071 17.3871 2.68357 17.8987 3.59667L19.7515 6.90331C20.2631 7.81642 19.9595 8.984 19.0733 9.51118L18.3212 9.95862C18.332 10.1377 18.3375 10.3182 18.3375 10.5C18.3375 10.6819 18.332 10.8624 18.3212 11.0415L19.0731 11.4888C19.9593 12.016 20.2629 13.1836 19.7513 14.0967L17.8985 17.4033C17.3869 18.3164 16.2538 18.6293 15.3676 18.1021L14.6162 17.6551C14.325 17.8549 14.0209 18.0364 13.7055 18.1979V19.0909C13.7055 20.1453 12.876 21 11.8528 21H8.14723C7.12397 21 6.29446 20.1453 6.29446 19.0909V18.1979C5.97906 18.0364 5.67499 17.8549 5.38381 17.6551L4.6324 18.1021C3.74623 18.6293 2.61309 18.3164 2.10147 17.4033L0.248697 14.0967C-0.262931 13.1836 0.0406917 12.016 0.926858 11.4888L1.67883 11.0415C1.66802 10.8624 1.66254 10.6819 1.66254 10.5C1.66254 10.3182 1.66802 10.1377 1.67882 9.95864L0.926694 9.5112C0.0405279 8.98402 -0.263095 7.81643 0.248534 6.90333L2.1013 3.59669C2.61293 2.68358 3.74607 2.37073 4.63223 2.89791L5.38373 3.34498C5.67493 3.14511 5.97903 2.96361 6.29446 2.80209V1.90909ZM10.0003 15.2727C12.5584 15.2727 14.6322 13.1359 14.6322 10.5C14.6322 7.8641 12.5584 5.72727 10.0003 5.72727C7.44211 5.72727 5.36833 7.8641 5.36833 10.5C5.36833 13.1359 7.44211 15.2727 10.0003 15.2727Z" fill="#565656"/>
                                 <path d="M12.7794 10.5C12.7794 12.0815 11.5351 13.3636 10.0003 13.3636C8.46537 13.3636 7.2211 12.0815 7.2211 10.5C7.2211 8.91846 8.46537 7.63636 10.0003 7.63636C11.5351 7.63636 12.7794 8.91846 12.7794 10.5Z" fill="#565656"/>
                               </svg>
-                              <svg className="cursor-pointer" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <svg
+                                onClick={() => handleKickPlayer(player)}
+                                className="cursor-pointer" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" clipRule="evenodd" d="M0.389165 0.396985C0.907962 -0.119475 1.74899 -0.119372 2.26766 0.397215L7.46409 5.56937L12.6671 0.387816C13.1856 -0.128942 14.0266 -0.12932 14.5456 0.386971C15.0646 0.903261 15.0649 1.74071 14.5464 2.25747L9.34236 7.4401L14.6111 12.7422C15.1297 13.2588 15.1296 14.0963 14.6108 14.6127C14.092 15.1292 13.251 15.1291 12.7323 14.6125L7.46471 9.31145L2.31188 14.5723C1.79338 15.089 0.95235 15.0894 0.433382 14.5731C-0.0855855 14.0568 -0.0859656 13.2194 0.432533 12.7026L5.58644 7.44072L0.388934 2.26748C-0.129735 1.7509 -0.129632 0.913446 0.389165 0.396985Z" fill="#F54242"/>
                               </svg>
                             </div>
+                            }
                           </div>
                         }
                     </div>
@@ -240,7 +263,14 @@ function RoomPage() {
         </>
       )}
       <CardPopup title={selectedCharacter?.name || ""} open={openCharacter} setOpen={setOpenCharacter}>
-        <SelectedCharacter selectedCharacter={selectedCharacter} updateRoomData={updateRoomData} updatePlayerById={updatePlayerById} />
+        <SelectedCharacter 
+          selectedCharacter={selectedCharacter} 
+          isStoryteller={currentPlayer.isStoryteller} 
+          updateRoomData={updateRoomData} 
+          updatePlayerById={updatePlayerById}
+          handleKickPlayer={handleKickPlayer}
+          setOpenCharacter={setOpenCharacter}
+          />
       </CardPopup>
       <CardPopup title={"Character Reference Sheet"} open={openCharReference} setOpen={setOpenCharReference}>
         <CharacterSheet />

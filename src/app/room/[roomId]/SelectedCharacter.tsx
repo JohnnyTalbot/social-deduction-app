@@ -10,11 +10,14 @@ import Button from "@/components/ui/Button";
 
 interface SelectedCharacterProps{
   selectedCharacter?: Player;
+  isStoryteller: boolean;
   updateRoomData: (partial: Partial<Room>) => void;
   updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
+  handleKickPlayer: (playerToKick: Player) => void;
+  setOpenCharacter: (openCharacter: boolean) => void;
 }
 
-function SelectedCharacter({selectedCharacter, updateRoomData, updatePlayerById} : SelectedCharacterProps){
+function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
   return(
     <div className="w-full h-full flex flex-row gap-5">
       <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
@@ -37,6 +40,23 @@ function SelectedCharacter({selectedCharacter, updateRoomData, updatePlayerById}
           />
         </Canvas>
       </div>
+      {
+      isStoryteller &&
+      <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
+        <Button
+          onClick={() => {
+            if (!selectedCharacter) return;
+
+            handleKickPlayer(selectedCharacter)
+            setOpenCharacter(false)
+          }}
+        >
+          Kick Player
+        </Button>
+      </div>
+      }
+      {
+      !isStoryteller &&
       <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
         <Button
           onClick={() => {
@@ -57,8 +77,10 @@ function SelectedCharacter({selectedCharacter, updateRoomData, updatePlayerById}
           Nominate Player
         </Button>
       </div>
+      }
     </div>
   )
 }
+
 
 export default SelectedCharacter;

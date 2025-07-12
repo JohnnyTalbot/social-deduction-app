@@ -13,6 +13,7 @@ export interface Player {
   last_changed?: number;
   isAnimating?: boolean;
   currentAnimation?: string;
+  wasKicked?: boolean;
 }
 
 export interface Message {

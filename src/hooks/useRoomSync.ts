@@ -1,9 +1,12 @@
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from 'react';
 import { ref, update, onValue, off } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { Player, Room } from '@/types/game';
+import { flushSync } from 'react-dom';
 
 export function useRoomSync(roomId: string) {
+  const router = useRouter();
   const [roomData, setRoomData] = useState<Room>();
   const [playerData, setPlayerData] = useState<Player>();
 
@@ -29,6 +32,29 @@ export function useRoomSync(roomId: string) {
     update(playerRef, partial);
   };
 
+  const handleKickPlayer = (playerToKick: Player) => {
+    if (!roomData || !playerToKick?.seatNumber) return;
+    if (!Array.isArray(roomData.seats)) return null;
+  
+    // Remove from seat
+    const updatedSeats = roomData?.seats.map(seat => {
+      if (seat.playerId === playerToKick.id) {
+        return { ...seat, playerId: '', isTaken: false };
+      }
+      return seat;
+    });
+    
+    flushSync(() => {
+      updateRoomData({ seats: updatedSeats });
+    })
+    
+    // Update player info
+    updatePlayerById(playerToKick.id, {
+      isSeated: false,
+      wasKicked: true
+    });
+  }
+
   useEffect(() => {
     if (!roomData || !isLocalRoomUpdate.current) return;
     update(ref(db, `rooms/${roomId}`), roomData);
@@ -40,6 +66,13 @@ export function useRoomSync(roomId: string) {
     update(ref(db, `rooms/${roomId}/players/${playerData.id}`), playerData);
     isLocalPlayerUpdate.current = false;
   }, [playerData, roomId]);
+
+  useEffect(() => {
+    if (playerData?.wasKicked) {
+      alert("You were removed from the game.");
+      router.push('/join')
+    }
+  }, [playerData]);
 
   // Listen for room data changes
   useEffect(() => {
@@ -56,6 +89,22 @@ export function useRoomSync(roomId: string) {
     return () => off(roomRef, 'value', unsubscribePlayers);
   }, [roomId]);
 
+  // Listen for current player data changes
+  useEffect(() => {
+    if (!roomId || !playerData?.id) return;
+
+    const playerRef = ref(db, `rooms/${roomId}/players/${playerData.id}`);
+    const unsubscribePlayer = onValue(playerRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setPlayerData((prev) => prev ? { ...prev, ...data } : prev);
+      }
+    });
+
+    return () => off(playerRef, 'value', unsubscribePlayer);
+  }, [roomId, playerData?.id]);
+
+
 
 
   return {
@@ -65,6 +114,7 @@ export function useRoomSync(roomId: string) {
     setPlayerData,
     updateRoomData,
     updatePlayerData,
-    updatePlayerById
+    updatePlayerById,
+    handleKickPlayer
   };
 }
