@@ -122,7 +122,7 @@ export default function Character({ position, rotation, model, name, playerData,
       
       {playerData && <Highlight visible={charHover} />}
 
-      {playerData && playerData?.id == roomData?.currentNominated && <Banner />}
+      {playerData && roomData?.votingData && playerData?.id == roomData?.votingData?.currentNominated && <Banner />}
 
       {name && (
         <Text

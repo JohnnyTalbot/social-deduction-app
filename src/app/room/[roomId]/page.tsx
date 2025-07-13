@@ -46,6 +46,7 @@ function RoomPage() {
     updateRoomData,
     updatePlayerData,
     updatePlayerById,
+    updateVotingData,
     handleKickPlayer
   } = useRoomSync(roomId as string);
 
@@ -120,6 +121,8 @@ function RoomPage() {
             <Dashboard 
               roomData={roomData} 
               updateRoomData={updateRoomData} 
+              updatePlayerById={updatePlayerById}
+              updateVotingData={updateVotingData}
               isStoryteller={playerData.isStoryteller}
               showRoles={showRoles}
               setShowRoles={setShowRoles}
@@ -266,7 +269,8 @@ function RoomPage() {
         <SelectedCharacter 
           selectedCharacter={selectedCharacter} 
           isStoryteller={currentPlayer.isStoryteller} 
-          updateRoomData={updateRoomData} 
+          updateRoomData={updateRoomData}
+          updateVotingData={updateVotingData}
           updatePlayerById={updatePlayerById}
           handleKickPlayer={handleKickPlayer}
           setOpenCharacter={setOpenCharacter}

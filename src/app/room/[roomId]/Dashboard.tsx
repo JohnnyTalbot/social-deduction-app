@@ -1,8 +1,11 @@
-import { Room } from '@/types/game';
+import { useState } from 'react';
+import { Room, Player, Seat } from '@/types/game';
 
-interface DashboardProps{
+interface DashboardProps {
   roomData: Room | unknown;
   updateRoomData: (partial: Partial<Room>) => void;
+  updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
+  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
   isStoryteller: boolean;
   showRoles: boolean;
   setShowRoles: (showRoles: boolean) => void;
@@ -10,84 +13,314 @@ interface DashboardProps{
   className?: string;
 }
 
-export default function Dashboard({className, roomData, updateRoomData, isStoryteller, showRoles, setShowRoles, setOpenAssigns}: DashboardProps) {
+export default function Dashboard({
+  className,
+  roomData,
+  updateRoomData,
+  updatePlayerById,
+  updateVotingData,
+  isStoryteller,
+  showRoles,
+  setShowRoles,
+  setOpenAssigns,
+}: DashboardProps) {
   const room = roomData as Room;
+  const [hoveredIcon, setHoveredIcon] = useState<string>("");
 
-  return(
-    <div className='m-2'>
-      {isStoryteller &&
-      <div
-        className={`flex flex-row justify-center items-center gap-6 bg-card p-5 ${className}`}
-        style={{
-          boxSizing: 'border-box',
-          border: '3px solid #000000',
-          boxShadow: '-5px 5px 0px #000000',
-          borderRadius: '30px',
-      }}
-      >
-        {/* Change Day/Night */}
-        <div className='cursor-pointer'>
-          {room.currentPhase != 'night' ? 
+  const getLabel = () => {
+    switch (hoveredIcon) {
+      case "phase":
+        return room.currentPhase === "night" ? "Set to Day" : "Set to Night";
+      case "roles":
+        return showRoles ? "Hide Roles" : "View Roles";
+      case "vote":
+        return "Start Vote";
+      case "assign":
+        return "Assign Roles";
+      default:
+        return "";
+    }
+  };
 
+  return (
+    <div className="m-2">
+      <div className="flex justify-center text-2xl h-[35px]">{getLabel()}</div>
+
+      {isStoryteller && (
+        <div
+          className={`flex flex-row justify-center items-center gap-6 bg-card p-5 ${className}`}
+          style={{
+            boxSizing: "border-box",
+            border: "3px solid #000000",
+            boxShadow: "-5px 5px 0px #000000",
+            borderRadius: "30px",
+          }}
+        >
+          {/* Change Day/Night */}
+          <div
+            className="cursor-pointer"
+            onMouseEnter={() => setHoveredIcon("phase")}
+            onMouseLeave={() => setHoveredIcon("")}
+          >
+            {room.currentPhase !== "night" ? (
+              <svg
+                onClick={() => updateRoomData({ currentPhase: "night" })}
+                width="30"
+                height="30"
+                viewBox="0 0 30 30"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M26.776 18.9746C18.1132 18.9746 11.0254 11.8868 11.0254 3.22395C11.0254 2.82098 11.0382 2.41802 11.0672 2.01867C11.1578 0.774255 10.0034 -0.402163 8.87594 0.132325C3.58667 2.63984 0 8.03967 0 14.2494C0 22.9122 7.08778 30 15.7506 30C21.9603 30 27.3602 26.4133 29.8677 21.1241C30.4022 19.9966 29.2257 18.8422 27.9813 18.9328C27.582 18.9618 27.179 18.9746 26.776 18.9746Z" fill="#51277D" />
+              </svg>
+            ) : (
+              <svg
+                onClick={() => updateRoomData({ currentPhase: "day" })}
+                width="30"
+                height="30"
+                viewBox="0 0 35 35"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="17.5" cy="17.5" r="10.5" fill="#51277D" />
+                <path d="M17.5 0L20.5311 5.25H14.4689L17.5 0Z" fill="#51277D" />
+                <path d="M17.5 35L14.4689 29.75L20.5311 29.75L17.5 35Z" fill="#51277D" />
+                <path d="M-1.5299e-07 17.5L5.25 14.4689L5.25 20.5311L-1.5299e-07 17.5Z" fill="#51277D" />
+                <path d="M35 17.5L29.75 20.5311L29.75 14.4689L35 17.5Z" fill="#51277D" />
+                <path d="M30.4246 5.47487L28.8556 11.3305L24.569 7.04388L30.4246 5.47487Z" fill="#51277D" />
+                <path d="M4.47487 5.47483L10.3305 7.04384L6.04388 11.3304L4.47487 5.47483Z" fill="#51277D" />
+                <path d="M4.45384 29.3825L6.02284 23.5269L10.3095 27.8135L4.45384 29.3825Z" fill="#51277D" />
+                <path d="M30.4246 29.4246L24.569 27.8556L28.8556 23.569L30.4246 29.4246Z" fill="#51277D" />
+              </svg>
+            )}
+          </div>
+
+          {/* Toggle Roles Visibility */}
+          <div
+            className="cursor-pointer"
+            onMouseEnter={() => setHoveredIcon("roles")}
+            onMouseLeave={() => setHoveredIcon("")}
+          >
+            {showRoles ? (
+              <svg
+                onClick={() => setShowRoles(false)}
+                width="40"
+                height="30"
+                viewBox="0 0 40 30"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path fillRule="evenodd" clipRule="evenodd" d="M20 0C15.1088 0 10.7744 2.59815 7.51496 5.36746C4.22394 8.16363 1.7889 11.3384 0.663779 12.9244C-0.221261 14.1719 -0.221259 15.8281 0.663779 17.0756C1.7889 18.6616 4.22394 21.8364 7.51496 24.6325C10.7744 27.4019 15.1088 30 20 30C24.8912 30 29.2256 27.4019 32.485 24.6325C35.7761 21.8364 38.2111 18.6616 39.3362 17.0756C40.2213 15.8281 40.2213 14.1719 39.3362 12.9244C38.2111 11.3384 35.7761 8.16363 32.485 5.36746C29.2256 2.59815 24.8912 0 20 0ZM20.0008 24.375C25.1098 24.375 29.2514 20.1777 29.2514 15C29.2514 9.82233 25.1098 5.625 20.0008 5.625C14.8919 5.625 10.7502 9.82233 10.7502 15C10.7502 20.1777 14.8919 24.375 20.0008 24.375Z" fill="#51277D"/>
+                <path d="M25.5512 15C25.5512 18.1066 23.0662 20.625 20.0008 20.625C16.9354 20.625 14.4505 18.1066 14.4505 15C14.4505 11.8934 16.9354 9.375 20.0008 9.375C23.0662 9.375 25.5512 11.8934 25.5512 15Z" fill="#51277D"/>
+              </svg>
+            ) : (
+              <svg
+                onClick={() => setShowRoles(true)}
+                width="40"
+                height="30"
+                viewBox="0 0 40 30"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M27.6884 3.50081C25.3676 2.40913 22.7733 1.66667 20 1.66667C15.1088 1.66667 10.7744 3.97613 7.51496 6.43774C4.22394 8.92322 1.7889 11.7452 0.663779 13.155C-0.221261 14.264 -0.221259 15.736 0.663779 16.845C1.6575 18.0901 3.67304 20.4369 6.39765 22.6804L11.4319 18.1454C10.9924 17.1749 10.7502 16.1129 10.7502 15C10.7502 10.3976 14.8919 6.66667 20.0008 6.66667C21.2362 6.66667 22.4151 6.88483 23.4925 7.28071L27.6884 3.50081Z" fill="#51277D"/>
+                <path fillRule="evenodd" clipRule="evenodd" d="M24.0026 11.5352L24.0041 11.5367L26.6209 9.17936L26.6193 9.17795L30.9036 5.31851L30.9054 5.3197L36.2687 0.488155C36.9913 -0.162718 38.1627 -0.162718 38.8852 0.488155C39.6077 1.13903 39.6077 2.1943 38.8852 2.84518L33.7669 7.45593C36.4081 9.65768 38.3626 11.9351 39.3362 13.155C40.2213 14.2639 40.2213 15.736 39.3362 16.845C38.2111 18.2548 35.7761 21.0768 32.485 23.5623C29.2256 26.0239 24.8912 28.3333 20 28.3333C17.3095 28.3333 14.7874 27.6345 12.5201 26.596L9.28327 29.5118C8.56075 30.1627 7.38932 30.1627 6.6668 29.5118C5.94428 28.861 5.94428 27.8057 6.6668 27.1548L9.27936 24.8013L9.27755 24.8002L13.5379 20.9622L13.5395 20.9636L16.1563 18.6063L16.1547 18.6049L24.0026 11.5352ZM28.6584 12.0579L25.549 14.859C25.5505 14.9058 25.5512 14.9528 25.5512 15C25.5512 17.7614 23.0662 20 20.0008 20C19.9485 20 19.8963 19.9993 19.8443 19.998L16.7349 22.7991C17.7504 23.1444 18.8511 23.3333 20.0008 23.3333C25.1098 23.3333 29.2514 19.6024 29.2514 15C29.2514 13.9643 29.0417 12.9728 28.6584 12.0579Z" fill="#51277D"/>
+                <path d="M20.4555 10.0165C20.3056 10.0056 20.1539 10 20.0008 10C16.9354 10 14.4505 12.2386 14.4505 15C14.4505 15.1379 14.4567 15.2745 14.4688 15.4096L20.4555 10.0165Z" fill="#51277D"/>
+              </svg>
+            )}
+          </div>
+
+          {/* Start Vote */}
+          <div
+            className="cursor-pointer"
+            onMouseEnter={() => setHoveredIcon("vote")}
+            onMouseLeave={() => setHoveredIcon("")}
+          >
             <svg
-              onClick={() => updateRoomData({currentPhase : "night"})}
-              width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M26.776 18.9746C18.1132 18.9746 11.0254 11.8868 11.0254 3.22395C11.0254 2.82098 11.0382 2.41802 11.0672 2.01867C11.1578 0.774255 10.0034 -0.402163 8.87594 0.132325C3.58667 2.63984 0 8.03967 0 14.2494C0 22.9122 7.08778 30 15.7506 30C21.9603 30 27.3602 26.4133 29.8677 21.1241C30.4022 19.9966 29.2257 18.8422 27.9813 18.9328C27.582 18.9618 27.179 18.9746 26.776 18.9746Z" fill="#51277D"/>
+              onClick={() => {
+                if (!room.votingData?.currentNominated) {
+                  alert("No player nominated for voting.");
+                  return;
+                }
+                handleStartVote({
+                  currentNominated: room.votingData?.currentNominated ?? "",
+                  roomData: room,
+                  updateRoomData,
+                  updateVotingData,
+                  updatePlayerById,
+                });
+              }}
+              width="26"
+              height="36"
+              viewBox="0 0 26 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M15.722 0C14.3151 0 13.1738 1.13804 13.1738 2.54203V9.33718H18.2735V2.54203C18.2735 1.13804 17.1321 0 15.722 0Z" fill="#51277D"/>
+              <path d="M11.7035 3.85677V10.1173C11.2071 10.3925 10.8688 11.4631 10.8688 12.0709V13.3317C10.4167 13.7424 9.81278 13.9928 9.152 13.9928C7.74506 13.9928 6.6037 12.8547 6.6037 11.4509V3.85677C6.6037 2.45279 7.74506 1.31475 9.152 1.31475C10.5621 1.31475 11.7035 2.45279 11.7035 3.85677Z" fill="#51277D"/>
+              <path d="M24.879 9.39313V3.85677C24.879 2.45279 23.7377 1.31475 22.3276 1.31475C20.9206 1.31475 19.7793 2.45279 19.7793 3.85677V9.33718H24.2752C24.4807 9.33718 24.683 9.35629 24.879 9.39313Z" fill="#51277D"/>
+              <path d="M2.5483 3.52169C1.14136 3.52169 0 4.65973 0 6.06371V11.4509C0 12.8547 1.14136 13.9928 2.5483 13.9928C3.9584 13.9928 5.09976 12.8547 5.09976 11.4509V6.06371C5.09976 4.65973 3.9584 3.52169 2.5483 3.52169Z" fill="#51277D"/>
+              <path d="M20.6077 34.25C20.6077 34.8023 20.16 35.25 19.6077 35.25H5.1892C4.63691 35.25 4.1892 34.8023 4.1892 34.25V29.0181L4.17318 28.9931C4.17318 27.3724 2.86435 26.0281 1.87499 25.012C1.78052 24.915 1.68894 24.8209 1.60172 24.7299C0.600975 23.6859 0.211831 22.7294 0.211831 21.0046V15.463C0.798902 16.0578 1.6158 16.4267 2.51984 16.4267H3.00358C4.32199 16.4267 5.45702 15.6389 5.96289 14.5093C6.46559 15.6389 7.60379 16.4267 8.92536 16.4267H9.4091C10.1214 16.4267 10.7804 16.1969 11.3154 15.8075C11.826 16.9279 12.7523 17.82 13.8979 18.2883C13.8493 18.3254 13.801 18.3632 13.753 18.4016C11.9782 19.822 10.5987 22.1214 10.6943 25.4414C10.7135 26.1096 11.2724 26.6357 11.9427 26.6166C12.6129 26.5974 13.1406 26.0402 13.1214 25.372C13.0486 22.8438 14.0644 21.2565 15.273 20.2894C16.0932 19.633 17.0043 19.2606 17.7537 19.093C18.3132 18.9678 18.8068 18.5073 18.8148 17.934L18.8193 17.6144C18.8271 17.0567 18.3772 16.6004 17.8194 16.6004H16.1067C14.3187 16.6004 12.8692 15.1554 12.8692 13.3729C12.8692 12.2347 13.8092 11.382 15.2466 11.382H22.4137C24.0632 11.382 25.5605 12.4546 25.5605 14.4287C25.5356 16.6419 25.5213 18.2685 25.5832 19.378L25.589 19.4814C25.686 21.2137 25.7571 22.482 24.4886 23.9412C24.1283 24.3556 23.6676 24.7855 23.1904 25.2308C21.9544 26.3841 20.6077 27.6407 20.6077 29.0006V34.25Z" fill="#51277D"/>
             </svg>
-            :
-            <svg 
-              onClick={() => updateRoomData({currentPhase : "day"})}
-              width="30" height="30" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="17.5" cy="17.5" r="10.5" fill="#51277D"/>
-              <path d="M17.5 0L20.5311 5.25H14.4689L17.5 0Z" fill="#51277D"/>
-              <path d="M17.5 35L14.4689 29.75L20.5311 29.75L17.5 35Z" fill="#51277D"/>
-              <path d="M-1.5299e-07 17.5L5.25 14.4689L5.25 20.5311L-1.5299e-07 17.5Z" fill="#51277D"/>
-              <path d="M35 17.5L29.75 20.5311L29.75 14.4689L35 17.5Z" fill="#51277D"/>
-              <path d="M30.4246 5.47487L28.8556 11.3305L24.569 7.04388L30.4246 5.47487Z" fill="#51277D"/>
-              <path d="M4.47487 5.47483L10.3305 7.04384L6.04388 11.3304L4.47487 5.47483Z" fill="#51277D"/>
-              <path d="M4.45384 29.3825L6.02284 23.5269L10.3095 27.8135L4.45384 29.3825Z" fill="#51277D"/>
-              <path d="M30.4246 29.4246L24.569 27.8556L28.8556 23.569L30.4246 29.4246Z" fill="#51277D"/>
-            </svg>
-          }
-        </div>
+          </div>
 
-        {/* Change visibility of roles */}
-        <div className='cursor-pointer'>
-          {
-            !showRoles ? 
-            <svg 
-              onClick={() => setShowRoles(true)}
-              width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" clipRule="evenodd" d="M20 0C15.1088 0 10.7744 2.59815 7.51496 5.36746C4.22394 8.16363 1.7889 11.3384 0.663779 12.9244C-0.221261 14.1719 -0.221259 15.8281 0.663779 17.0756C1.7889 18.6616 4.22394 21.8364 7.51496 24.6325C10.7744 27.4019 15.1088 30 20 30C24.8912 30 29.2256 27.4019 32.485 24.6325C35.7761 21.8364 38.2111 18.6616 39.3362 17.0756C40.2213 15.8281 40.2213 14.1719 39.3362 12.9244C38.2111 11.3384 35.7761 8.16363 32.485 5.36746C29.2256 2.59815 24.8912 0 20 0ZM20.0008 24.375C25.1098 24.375 29.2514 20.1777 29.2514 15C29.2514 9.82233 25.1098 5.625 20.0008 5.625C14.8919 5.625 10.7502 9.82233 10.7502 15C10.7502 20.1777 14.8919 24.375 20.0008 24.375Z" fill="#51277D"/>
-              <path d="M25.5512 15C25.5512 18.1066 23.0662 20.625 20.0008 20.625C16.9354 20.625 14.4505 18.1066 14.4505 15C14.4505 11.8934 16.9354 9.375 20.0008 9.375C23.0662 9.375 25.5512 11.8934 25.5512 15Z" fill="#51277D"/>
+          {/* Assign Roles */}
+          <div
+            className="cursor-pointer"
+            onMouseEnter={() => setHoveredIcon("assign")}
+            onMouseLeave={() => setHoveredIcon("")}
+          >
+            <svg
+              onClick={() => setOpenAssigns(true)}
+              width="33"
+              height="33"
+              viewBox="0 0 33 33"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M14.1429 12.5714C17.6144 12.5714 20.4286 9.75722 20.4286 6.28571C20.4286 2.81421 17.6144 0 14.1429 0C10.6714 0 7.85722 2.81421 7.85722 6.28571C7.85722 9.75722 10.6714 12.5714 14.1429 12.5714Z" fill="#51277D"/>
+              <path d="M2.32042 20.7589C4.38576 17.8797 8.04356 15.7143 14.1428 15.7143C14.7615 15.7143 15.3551 15.7366 15.9245 15.7796C15.3501 16.0983 14.8565 16.5579 14.5421 17.1187L13.474 19.024C12.5891 20.6023 13.1142 22.6206 14.6469 23.5319L14.7133 23.5714L14.6468 23.6109C13.1142 24.5222 12.5891 26.5404 13.4739 28.1188L14.5421 30.0241C14.8238 30.5266 15.2493 31.0195 15.748 31.4286H3.00677C1.48142 31.4286 -0.00636277 30.2702 2.04666e-05 28.4956C0.00636848 26.7308 0.324298 23.5415 2.32042 20.7589Z" fill="#51277D"/>
+              <path d="M27.0119 23.5714C27.0119 25.1336 25.7979 26.4 24.3005 26.4C22.803 26.4 21.589 25.1336 21.589 23.5714C21.589 22.0093 22.803 20.7429 24.3005 20.7429C25.7979 20.7429 27.0119 22.0093 27.0119 23.5714Z" fill="#51277D"/>
+              <path fillRule="evenodd" clipRule="evenodd" d="M31.6438 23.6052C32.9407 24.3863 33.385 26.1162 32.6363 27.4691L31.7325 29.1022C30.9837 30.4551 29.3255 30.9186 28.0286 30.1375L27.9724 30.1036V30.1714C27.9723 31.7336 26.7584 33 25.2609 33H23.4533C21.9558 33 20.7419 31.7336 20.7419 30.1714V30.1037L20.6857 30.1376C19.3888 30.9187 17.7305 30.4551 16.9818 29.1023L16.078 27.4692C15.3293 26.1163 15.7736 24.3864 17.0705 23.6053L17.1267 23.5714L17.0705 23.5375C15.7736 22.7564 15.3293 21.0265 16.0781 19.6736L16.9819 18.0405C17.7306 16.6876 19.3889 16.2241 20.6857 17.0052L20.7419 17.039V16.9714C20.7419 15.4093 21.9558 14.1429 23.4533 14.1429H25.2609C26.7584 14.1429 27.9724 15.4093 27.9724 16.9714V17.0391L28.0285 17.0053C29.3254 16.2242 30.9837 16.6877 31.7324 18.0406L32.6362 19.6737C33.385 21.0266 32.9406 22.7565 31.6438 23.5376L31.5877 23.5714L31.6438 23.6052ZM24.3005 28.2857C26.7963 28.2857 28.8195 26.1751 28.8195 23.5714C28.8195 20.9678 26.7963 18.8571 24.3005 18.8571C21.8047 18.8571 19.7814 20.9678 19.7814 23.5714C19.7814 26.1751 21.8047 28.2857 24.3005 28.2857Z" fill="#51277D"/>
             </svg>
-          :
-            <svg 
-              onClick={() => setShowRoles(false)}
-              width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M27.6884 3.50081C25.3676 2.40913 22.7733 1.66667 20 1.66667C15.1088 1.66667 10.7744 3.97613 7.51496 6.43774C4.22394 8.92322 1.7889 11.7452 0.663779 13.155C-0.221261 14.264 -0.221259 15.736 0.663779 16.845C1.6575 18.0901 3.67304 20.4369 6.39765 22.6804L11.4319 18.1454C10.9924 17.1749 10.7502 16.1129 10.7502 15C10.7502 10.3976 14.8919 6.66667 20.0008 6.66667C21.2362 6.66667 22.4151 6.88483 23.4925 7.28071L27.6884 3.50081Z" fill="#51277D"/>
-              <path fillRule="evenodd" clipRule="evenodd" d="M24.0026 11.5352L24.0041 11.5367L26.6209 9.17936L26.6193 9.17795L30.9036 5.31851L30.9054 5.3197L36.2687 0.488155C36.9913 -0.162718 38.1627 -0.162718 38.8852 0.488155C39.6077 1.13903 39.6077 2.1943 38.8852 2.84518L33.7669 7.45593C36.4081 9.65768 38.3626 11.9351 39.3362 13.155C40.2213 14.2639 40.2213 15.736 39.3362 16.845C38.2111 18.2548 35.7761 21.0768 32.485 23.5623C29.2256 26.0239 24.8912 28.3333 20 28.3333C17.3095 28.3333 14.7874 27.6345 12.5201 26.596L9.28327 29.5118C8.56075 30.1627 7.38932 30.1627 6.6668 29.5118C5.94428 28.861 5.94428 27.8057 6.6668 27.1548L9.27936 24.8013L9.27755 24.8002L13.5379 20.9622L13.5395 20.9636L16.1563 18.6063L16.1547 18.6049L24.0026 11.5352ZM28.6584 12.0579L25.549 14.859C25.5505 14.9058 25.5512 14.9528 25.5512 15C25.5512 17.7614 23.0662 20 20.0008 20C19.9485 20 19.8963 19.9993 19.8443 19.998L16.7349 22.7991C17.7504 23.1444 18.8511 23.3333 20.0008 23.3333C25.1098 23.3333 29.2514 19.6024 29.2514 15C29.2514 13.9643 29.0417 12.9728 28.6584 12.0579Z" fill="#51277D"/>
-              <path d="M20.4555 10.0165C20.3056 10.0056 20.1539 10 20.0008 10C16.9354 10 14.4505 12.2386 14.4505 15C14.4505 15.1379 14.4567 15.2745 14.4688 15.4096L20.4555 10.0165Z" fill="#51277D"/>
-            </svg>
-          }
+          </div>
         </div>
-
-        {/* Assign Roles */}
-        <div className='cursor-pointer'>
-          <svg
-            onClick={() => setOpenAssigns(true)}
-            width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14.1429 12.5714C17.6144 12.5714 20.4286 9.75722 20.4286 6.28571C20.4286 2.81421 17.6144 0 14.1429 0C10.6714 0 7.85722 2.81421 7.85722 6.28571C7.85722 9.75722 10.6714 12.5714 14.1429 12.5714Z" fill="#51277D"/>
-            <path d="M2.32042 20.7589C4.38576 17.8797 8.04356 15.7143 14.1428 15.7143C14.7615 15.7143 15.3551 15.7366 15.9245 15.7796C15.3501 16.0983 14.8565 16.5579 14.5421 17.1187L13.474 19.024C12.5891 20.6023 13.1142 22.6206 14.6469 23.5319L14.7133 23.5714L14.6468 23.6109C13.1142 24.5222 12.5891 26.5404 13.4739 28.1188L14.5421 30.0241C14.8238 30.5266 15.2493 31.0195 15.748 31.4286H3.00677C1.48142 31.4286 -0.00636277 30.2702 2.04666e-05 28.4956C0.00636848 26.7308 0.324298 23.5415 2.32042 20.7589Z" fill="#51277D"/>
-            <path d="M27.0119 23.5714C27.0119 25.1336 25.7979 26.4 24.3005 26.4C22.803 26.4 21.589 25.1336 21.589 23.5714C21.589 22.0093 22.803 20.7429 24.3005 20.7429C25.7979 20.7429 27.0119 22.0093 27.0119 23.5714Z" fill="#51277D"/>
-            <path fillRule="evenodd" clipRule="evenodd" d="M31.6438 23.6052C32.9407 24.3863 33.385 26.1162 32.6363 27.4691L31.7325 29.1022C30.9837 30.4551 29.3255 30.9186 28.0286 30.1375L27.9724 30.1036V30.1714C27.9723 31.7336 26.7584 33 25.2609 33H23.4533C21.9558 33 20.7419 31.7336 20.7419 30.1714V30.1037L20.6857 30.1376C19.3888 30.9187 17.7305 30.4551 16.9818 29.1023L16.078 27.4692C15.3293 26.1163 15.7736 24.3864 17.0705 23.6053L17.1267 23.5714L17.0705 23.5375C15.7736 22.7564 15.3293 21.0265 16.0781 19.6736L16.9819 18.0405C17.7306 16.6876 19.3889 16.2241 20.6857 17.0052L20.7419 17.039V16.9714C20.7419 15.4093 21.9558 14.1429 23.4533 14.1429H25.2609C26.7584 14.1429 27.9724 15.4093 27.9724 16.9714V17.0391L28.0285 17.0053C29.3254 16.2242 30.9837 16.6877 31.7324 18.0406L32.6362 19.6737C33.385 21.0266 32.9406 22.7565 31.6438 23.5376L31.5877 23.5714L31.6438 23.6052ZM24.3005 28.2857C26.7963 28.2857 28.8195 26.1751 28.8195 23.5714C28.8195 20.9678 26.7963 18.8571 24.3005 18.8571C21.8047 18.8571 19.7814 20.9678 19.7814 23.5714C19.7814 26.1751 21.8047 28.2857 24.3005 28.2857Z" fill="#51277D"/>
-          </svg>
-        </div>
-      </div>}
-      {!isStoryteller &&
-      <div>
-
-      </div>}
+      )}
     </div>
-  )
+  );
 }
+
+function handleStartVote({
+  currentNominated,
+  roomData,
+  updateRoomData,
+  updateVotingData,
+  updatePlayerById,
+}: {
+  currentNominated: string;
+  roomData: Room;
+  updateRoomData: (partial: Partial<Room>) => void;
+  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
+  updatePlayerById: (playerId: string, updates: Partial<Player>) => void;
+}) {
+  if (!currentNominated) {
+    alert("No player nominated for vote.");
+    return;
+  }
+
+  const seats = roomData.seats;
+  const nominatedIndex = seats.findIndex(s => s.playerId === currentNominated);
+  if (nominatedIndex === -1) {
+    alert("Nominated player is not seated.");
+    return;
+  }
+
+  // Start 3...2...1 countdown
+  let countdown = 3;
+  const countdownInterval = setInterval(() => {
+    updateVotingData({
+      phase: "countdown",
+      countdown,
+      votes: { [currentNominated]: [] }, // initialize vote tracker
+    });
+    countdown--;
+    console.log(`Countdown: ${countdown}`);
+
+    if (countdown === 0) {
+      clearInterval(countdownInterval);
+      beginVoting(nominatedIndex);
+    }
+  }, 1000);
+
+  function beginVoting(startIndex: number) {
+    const votingOrder = getVotingSeatsInOrder(seats, startIndex);
+    let currentIndex = 0;
+
+    console.log("Starting voting with order:", votingOrder);
+
+    const passedPlayerIds: Set<string> = new Set();
+
+    function proceedToNextVoter() {
+      const currentSeat = votingOrder[currentIndex];
+
+      // Lock in votes for players who have passed
+      if (currentIndex > 0) {
+        const previouslyPassedSeats = votingOrder.slice(0, currentIndex);
+        previouslyPassedSeats.forEach(seat => {
+          const playerId = seat.playerId;
+          const player = playerId ? roomData.players[playerId] : undefined;
+          if (!playerId || !player) return;
+
+          console.log(`Player ${playerId} has passed.`);
+
+          // If they were voting when passed, lock their vote in
+          if (player.isVoting) {
+            const currentVotes = roomData.votingData?.votes || {};
+            const existingVoters = currentVotes[currentNominated] || [];
+
+            if (!existingVoters.includes(playerId)) {
+              const updatedVotes = {
+                ...currentVotes,
+                [currentNominated]: [...existingVoters, playerId],
+              };
+
+              updateVotingData({
+                votes: updatedVotes,
+              });
+            }
+
+            // Update player's voting status
+            updatePlayerById(playerId, {
+              isVoting: false,
+              canVote: player.isAlive ? player.canVote : false,
+            });
+          }
+        });
+      }
+
+      // If no more voters, voting ends
+      if (!currentSeat) {
+        console.log("Voting complete.");
+
+        // Reset isVoting for everyone
+        Object.entries(roomData.players).forEach(([playerId, player]) => {
+          if (player.isVoting) {
+            updatePlayerById(playerId, { isVoting: false });
+          }
+        });
+
+        updateVotingData({
+          phase: "nominations",
+          currentNominated: "",
+          currentlyVoting: null,
+        });
+
+        return;
+      }
+
+      // Set who's currently voting
+      updateVotingData({
+        phase: "voting",
+        currentlyVoting: currentSeat,
+      });
+
+      setTimeout(() => {
+        currentIndex++;
+        proceedToNextVoter();
+      }, 3000); // 3 seconds per voter
+    }
+
+    proceedToNextVoter();
+  }
+
+  function getVotingSeatsInOrder(seats: Seat[], startIndex: number): Seat[] {
+    const canVote = (seat: Seat) =>
+      seat.isTaken &&
+      typeof seat.playerId === 'string' &&
+      roomData.players[seat.playerId]?.canVote;
+
+    const orderedSeats = [...seats.slice(startIndex), ...seats.slice(0, startIndex)];
+    return orderedSeats.filter(canVote);
+  }
+}
+
+

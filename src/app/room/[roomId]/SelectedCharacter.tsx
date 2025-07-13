@@ -12,12 +12,13 @@ interface SelectedCharacterProps{
   selectedCharacter?: Player;
   isStoryteller: boolean;
   updateRoomData: (partial: Partial<Room>) => void;
+  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
   updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
   handleKickPlayer: (playerToKick: Player) => void;
   setOpenCharacter: (openCharacter: boolean) => void;
 }
 
-function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
+function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, updateVotingData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
   return(
     <div className="w-full h-full flex flex-row gap-5">
       <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
@@ -63,8 +64,9 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, up
             if (!selectedCharacter) return;
 
             flushSync(() => {
-              updateRoomData({
-                currentNominated: selectedCharacter.id,
+              updateVotingData({
+                phase: "nominations",
+                currentNominated: selectedCharacter.id
               });
             });
 

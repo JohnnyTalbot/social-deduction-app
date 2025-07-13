@@ -55,6 +55,19 @@ export function useRoomSync(roomId: string) {
     });
   }
 
+  const updateVotingData = (partialOrUpdater: Partial<Room["votingData"]> | ((prev: Room["votingData"]) => Partial<Room["votingData"]>)) => {
+    const current = roomData?.votingData || {};
+    const partial = typeof partialOrUpdater === 'function' ? partialOrUpdater(current) : partialOrUpdater;
+    updateRoomData({
+      votingData: {
+        ...current,
+        ...partial,
+      }
+    });
+  }
+
+
+
   useEffect(() => {
     if (!roomData || !isLocalRoomUpdate.current) return;
     update(ref(db, `rooms/${roomId}`), roomData);
@@ -115,6 +128,7 @@ export function useRoomSync(roomId: string) {
     updateRoomData,
     updatePlayerData,
     updatePlayerById,
+    updateVotingData,
     handleKickPlayer
   };
 }

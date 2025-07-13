@@ -8,7 +8,10 @@ export interface Player {
   isSeated: boolean;
   seatNumber?: number;
   loadState?: "loading" | "ready" | "offline";
-  state?: "online" | "offline",
+  state?: "online" | "offline";
+  isAlive?: boolean;
+  canVote?: boolean;
+  isVoting?: boolean;
   role?: string;
   last_changed?: number;
   isAnimating?: boolean;
@@ -57,12 +60,19 @@ export interface Room {
   storytellerName: string;
   createdAt: number;
   status: "waiting" | "in-progress" | "ended";
-  players: { [playerId: string]: Player }; // Denormalized for easier display, or use subcollection
+  players: { [playerId: string]: Player };
   seats: Seat[];
   // For AI tips
   currentRound: number;
   currentPhase: "day" | "night" | "voting" | "setup";
+  votingData?: {
+    phase?: "nominations" | "countdown" | "voting";
+    countdown?: number;
+    votes?: { [nominatedPlayerId: string]: string[] }; // list of voter IDs who voted for them
+    currentNominated?: string | null;
+    playerNominating?: string; // Player ID of the one nominating
+    currentlyVoting?: Seat | null; // Seat of the player currently voting
+  };
   // Store generated roles if needed
   generatedRoles?: Role[];
-  currentNominated?: string; // Player Id
 }
