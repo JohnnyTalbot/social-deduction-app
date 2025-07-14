@@ -216,20 +216,27 @@ function handleStartVote({
 
   // Start 3...2...1 countdown
   let countdown = 3;
-  const countdownInterval = setInterval(() => {
+
+  function runCountdown() {
     updateVotingData({
       phase: "countdown",
       countdown,
-      votes: { [currentNominated]: [] }, // initialize vote tracker
+      votes: { [currentNominated]: [] },
     });
-    countdown--;
+
     console.log(`Countdown: ${countdown}`);
 
     if (countdown === 0) {
-      clearInterval(countdownInterval);
       beginVoting(nominatedIndex);
+      return;
     }
-  }, 1000);
+    countdown--;
+
+    setTimeout(runCountdown, 1000);
+  }
+
+  runCountdown();
+
 
   function beginVoting(startIndex: number) {
     const votingOrder = getVotingSeatsInOrder(seats, startIndex);

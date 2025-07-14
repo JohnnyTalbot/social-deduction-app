@@ -7,6 +7,8 @@ import { Room, Player, Seat } from '@/types/game';
 import Plus from '@/components/models/Plus';
 import Character from '@/components/models/Character';
 import Table from '@/components/models/Table';
+import VotingArrow from '@/components/models/VotingArrow';
+import Countdown from '@/components/models/Countdown';
 
 interface GameAreaProps {
   roomData: Room | unknown;
@@ -65,8 +67,29 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
       <ambientLight intensity={room.currentPhase != "night" ? 0.5 : 0.2} />
       {room.currentPhase != "night" && <directionalLight color={"yellow"} position={[0, 20, 0]} />}
       <Table />
-      <OrbitControls />
+      
+      // Voting Phase
+      {room.votingData?.phase === "countdown" && (
+        <Countdown countdown={room.votingData.countdown || 0} />
+      )}
 
+      // Voting Arrow for currently voting player
+      {room.votingData?.currentlyVoting && (() => {
+        const seat = room.seats.find(s => s.number === room.votingData?.currentlyVoting?.number)
+        if (!seat || !seat.isTaken || !seat.playerId) return null;
+
+        const seatIndex = room.seats.findIndex(s => s.number === seat.number);
+        const angle = (seatIndex / count) * Math.PI * 2;
+        const x = 5 * Math.cos(angle);
+        const z = 5 * Math.sin(angle);
+
+        return (
+          <VotingArrow key="voting-arrow" targetPosition={[x, 0, z]} color="orange" />
+        )
+      })()}
+      
+      <OrbitControls />
+  
       {(roomData as Room).seats.map((seat, i) => {
         const angle = (i / count) * Math.PI * 2 + angleOffset
 
