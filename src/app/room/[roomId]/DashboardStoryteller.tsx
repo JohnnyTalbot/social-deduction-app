@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Room, Player, Seat } from '@/types/game';
 
-interface DashboardProps {
+interface DashboardStorytellerProps {
   roomData: Room | unknown;
   updateRoomData: (partial: Partial<Room>) => void;
   updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
-  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
+  handleStartVote: (currentNominated: string) => void;
   isStoryteller: boolean;
   showRoles: boolean;
   setShowRoles: (showRoles: boolean) => void;
@@ -13,17 +13,17 @@ interface DashboardProps {
   className?: string;
 }
 
-export default function Dashboard({
+export default function DashboardStoryteller({
   className,
   roomData,
   updateRoomData,
   updatePlayerById,
-  updateVotingData,
+  handleStartVote,
   isStoryteller,
   showRoles,
   setShowRoles,
   setOpenAssigns,
-}: DashboardProps) {
+}: DashboardStorytellerProps) {
   const room = roomData as Room;
   const [hoveredIcon, setHoveredIcon] = useState<string>("");
 
@@ -137,17 +137,7 @@ export default function Dashboard({
           >
             <svg
               onClick={() => {
-                if (!room.votingData?.currentNominated) {
-                  alert("No player nominated for voting.");
-                  return;
-                }
-                handleStartVote({
-                  currentNominated: room.votingData?.currentNominated ?? "",
-                  roomData: room,
-                  updateRoomData,
-                  updateVotingData,
-                  updatePlayerById,
-                });
+                handleStartVote(room.votingData?.currentNominated ?? "");
               }}
               width="26"
               height="36"
@@ -187,147 +177,6 @@ export default function Dashboard({
       )}
     </div>
   );
-}
-
-function handleStartVote({
-  currentNominated,
-  roomData,
-  updateRoomData,
-  updateVotingData,
-  updatePlayerById,
-}: {
-  currentNominated: string;
-  roomData: Room;
-  updateRoomData: (partial: Partial<Room>) => void;
-  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
-  updatePlayerById: (playerId: string, updates: Partial<Player>) => void;
-}) {
-  if (!currentNominated) {
-    alert("No player nominated for vote.");
-    return;
-  }
-
-  const seats = roomData.seats;
-  const nominatedIndex = seats.findIndex(s => s.playerId === currentNominated);
-  if (nominatedIndex === -1) {
-    alert("Nominated player is not seated.");
-    return;
-  }
-
-  // Start 3...2...1 countdown
-  let countdown = 3;
-
-  function runCountdown() {
-    updateVotingData({
-      phase: "countdown",
-      countdown,
-      votes: { [currentNominated]: [] },
-    });
-
-    console.log(`Countdown: ${countdown}`);
-
-    if (countdown === 0) {
-      beginVoting(nominatedIndex);
-      return;
-    }
-    countdown--;
-
-    setTimeout(runCountdown, 1000);
-  }
-
-  runCountdown();
-
-
-  function beginVoting(startIndex: number) {
-    const votingOrder = getVotingSeatsInOrder(seats, startIndex);
-    let currentIndex = 0;
-
-    console.log("Starting voting with order:", votingOrder);
-
-    const passedPlayerIds: Set<string> = new Set();
-
-    function proceedToNextVoter() {
-      const currentSeat = votingOrder[currentIndex];
-
-      // Lock in votes for players who have passed
-      if (currentIndex > 0) {
-        const previouslyPassedSeats = votingOrder.slice(0, currentIndex);
-        previouslyPassedSeats.forEach(seat => {
-          const playerId = seat.playerId;
-          const player = playerId ? roomData.players[playerId] : undefined;
-          if (!playerId || !player) return;
-
-          console.log(`Player ${playerId} has passed.`);
-
-          // If they were voting when passed, lock their vote in
-          if (player.isVoting) {
-            const currentVotes = roomData.votingData?.votes || {};
-            const existingVoters = currentVotes[currentNominated] || [];
-
-            if (!existingVoters.includes(playerId)) {
-              const updatedVotes = {
-                ...currentVotes,
-                [currentNominated]: [...existingVoters, playerId],
-              };
-
-              updateVotingData({
-                votes: updatedVotes,
-              });
-            }
-
-            // Update player's voting status
-            updatePlayerById(playerId, {
-              isVoting: false,
-              canVote: player.isAlive ? player.canVote : false,
-            });
-          }
-        });
-      }
-
-      // If no more voters, voting ends
-      if (!currentSeat) {
-        console.log("Voting complete.");
-
-        // Reset isVoting for everyone
-        Object.entries(roomData.players).forEach(([playerId, player]) => {
-          if (player.isVoting) {
-            updatePlayerById(playerId, { isVoting: false });
-          }
-        });
-
-        updateVotingData({
-          phase: "nominations",
-          currentNominated: "",
-          currentlyVoting: null,
-        });
-
-        return;
-      }
-
-      // Set who's currently voting
-      updateVotingData({
-        phase: "voting",
-        currentlyVoting: currentSeat,
-      });
-
-      setTimeout(() => {
-        currentIndex++;
-        proceedToNextVoter();
-      }, 3000); // 3 seconds per voter
-    }
-
-    proceedToNextVoter();
-  }
-
-  function getVotingSeatsInOrder(seats: Seat[], startIndex: number): Seat[] {
-    const canVote = (seat: Seat) =>
-      seat.isTaken &&
-      typeof seat.playerId === 'string' &&
-      roomData.players[seat.playerId]?.canVote;
-
-    const orderedSeats = [...seats.slice(startIndex), ...seats.slice(0, startIndex)];
-    return orderedSeats.filter(canVote);
-  }
 }
 
 

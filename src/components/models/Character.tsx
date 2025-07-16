@@ -52,6 +52,9 @@ export default function Character({ position, rotation, model, name, playerData,
 
   useEffect(() => {
     if (!isSceneReady || !playerData?.isAnimating || !playerData.currentAnimation) return;
+    if (playerData?.isVoting) return;
+
+    console.log("playerData.isVoting:", playerData.isVoting);
 
     // Optional: prevent triggering same animation repeatedly
     // if (lastAnimationRef.current === playerData.currentAnimation) return;
@@ -61,26 +64,32 @@ export default function Character({ position, rotation, model, name, playerData,
   }, [playerData?.isAnimating, playerData?.currentAnimation, playAnimation, isSceneReady]);
 
 
-  // Use useLayoutEffect for finding the arm, as it relies on the actual mounted object
-  // useLayoutEffect(() => {
-  //   if (!clonedScene || !characterGroupRef.current) {
-  //       armRef.current = null; // Clear armRef if not ready
-  //       return;
-  //   }
-  //   const foundArm = clonedScene.getObjectByName('arm-left'); // Search on the cloned object directly
+  // isVoting arm raised:
+  useLayoutEffect(() => {
+    if (!clonedScene || !characterGroupRef.current) {
+        armRef.current = null; // Clear armRef if not ready
+        return;
+    }
+    const foundArm = clonedScene.getObjectByName('arm-left'); // Search on the cloned object directly
 
-  //   if (foundArm) {
-  //     armRef.current = foundArm;
-  //   } else {
-  //     armRef.current = null;
-  //   }
-  // }, [clonedScene, name]);
+    if (foundArm) {
+      armRef.current = foundArm;
+    } else {
+      armRef.current = null;
+    }
+  }, [clonedScene]);
 
-  // useFrame(() => {
-  //   if (armRef.current) {
-  //     armRef.current.rotation.z = Math.sin(Date.now() * 0.002) * 0.5;
-  //   }
-  // });
+  useFrame(() => {
+    if (!armRef.current || !playerData) return;
+
+    if (playerData.isVoting) {
+      // Raise arm statically — adjust axis/values based on model orientation
+      armRef.current.rotation.x = -Math.PI / 2;
+      armRef.current.rotation.y = 0;
+      armRef.current.rotation.z = 0;
+    }
+  });
+
 
   // Make text always face the camera
   useFrame(() => {

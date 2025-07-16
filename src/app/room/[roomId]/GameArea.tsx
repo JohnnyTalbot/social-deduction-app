@@ -74,7 +74,7 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
       )}
 
       // Voting Arrow for currently voting player
-      {room.votingData?.currentlyVoting && (() => {
+      {room.votingData?.currentlyVoting && !(room.votingData?.phase == "nominations") && (() => {
         const seat = room.seats.find(s => s.number === room.votingData?.currentlyVoting?.number)
         if (!seat || !seat.isTaken || !seat.playerId) return null;
 
@@ -87,7 +87,7 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
           <VotingArrow key="voting-arrow" targetPosition={[x, 0, z]} color="orange" />
         )
       })()}
-      
+
       <OrbitControls />
   
       {(roomData as Room).seats.map((seat, i) => {

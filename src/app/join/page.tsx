@@ -53,6 +53,7 @@ function JoinRoom() {
         model: models[selectedModel],
         loadState: "loading",
         isAlive: true,
+        isVoting: false,
         canVote: true,
       }
 

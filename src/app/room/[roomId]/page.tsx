@@ -13,7 +13,8 @@ import { TroubleBrewing } from "@/data/Scripts";
 import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
-import Dashboard from "./Dashboard";
+import DashboardStoryteller from "./DashboardStoryteller";
+import DashboardPlayer from "./DashboardPlayer";
 import CharacterSheet from "./CharacterSheet";
 import AssignRoles from "./AssignRoles";
 import SelectedCharacter from "./SelectedCharacter";
@@ -47,7 +48,8 @@ function RoomPage() {
     updatePlayerData,
     updatePlayerById,
     updateVotingData,
-    handleKickPlayer
+    handleKickPlayer,
+    handleStartVote
   } = useRoomSync(roomId as string);
 
   const seatedPlayers = roomData
@@ -108,26 +110,39 @@ function RoomPage() {
       />
       {playerData && roomData && (
         <>
-          <h1 className="text-5xl absolute top-0">Room Code: {roomId}</h1>
-          <div className="flex flex-col justify-center items-center">
-            <p>{playerData.name}</p>
-            <p>
-              {playerData.isStoryteller
-                ? "(Storyteller)"
-                : playerData.isSeated
-                ? "(Player)"
-                : "(Spectator)"}
-            </p>
-            <Dashboard 
-              roomData={roomData} 
-              updateRoomData={updateRoomData} 
+          <div className="flex flex-row justify-between items-center w-full text-5xl absolute top-0 px-5 py-5">
+            <p>{playerData?.name} {playerData?.isStoryteller ? "(Storyteller)" : playerData?.isSeated ? "(Player)" : "(Spectator)"}</p>
+            <p>Room Code: {roomId}</p>
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 0C1.34314 0 0 1.34315 0 3V27C0 28.6569 1.34315 30 3 30H13.5C15.1569 30 16.5 28.6569 16.5 27V19.5H9C7.34315 19.5 6 18.1569 6 16.5V13.5C6 11.8431 7.34315 10.5 9 10.5H16.5V3C16.5 1.34315 15.1569 0 13.5 0H3Z" fill="#51277D"/>
+              <path d="M9 13.5V16.5L24.8787 16.5L21.4393 19.9393C20.8536 20.5251 20.8536 21.4749 21.4393 22.0607C22.0251 22.6464 22.9749 22.6464 23.5607 22.0607L29.3485 16.2728C29.386 16.2353 29.4214 16.1966 29.4549 16.1568C29.7878 15.8817 30 15.4656 30 15C30 14.5344 29.7878 14.1183 29.4549 13.8432C29.4214 13.8034 29.386 13.7647 29.3485 13.7272L23.5607 7.93934C22.9749 7.35355 22.0251 7.35355 21.4393 7.93934C20.8536 8.52513 20.8536 9.47487 21.4393 10.0607L24.8787 13.5L9 13.5Z" fill="#51277D"/>
+            </svg>
+          </div>
+          <div className="flex flex-col justify-center items-center absolute bottom-0">
+            {playerData?.isStoryteller ?
+            <DashboardStoryteller
+              roomData={roomData}
+              updateRoomData={updateRoomData}
               updatePlayerById={updatePlayerById}
-              updateVotingData={updateVotingData}
+              handleStartVote={handleStartVote}
               isStoryteller={playerData.isStoryteller}
               showRoles={showRoles}
               setShowRoles={setShowRoles}
               setOpenAssigns={setOpenAssigns}
             />
+              :
+            <DashboardPlayer
+              roomData={roomData}
+              playerData={playerData}
+              updateRoomData={updateRoomData}
+              updatePlayerById={updatePlayerById}
+              updatePlayerData={updatePlayerData}
+              updateVotingData={updateVotingData}
+              isStoryteller={playerData.isStoryteller}
+              showRoles={showRoles}
+              setShowRoles={setShowRoles}
+              setOpenAssigns={setOpenAssigns}
+            />}
           </div>
 
           <div className="flex flex-col items-start h-auto w-auto absolute left-0 mt-auto mb-auto">

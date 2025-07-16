@@ -8,10 +8,9 @@ function CenteredNumber({ url }: { url: string }) {
   const groupRef = useRef<THREE.Group>(null);
   const camera = useThree((state) => state.camera);
 
-  // Center geometry and rotate model
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh) {
-      child.geometry.center(); // move pivot to center
+      child.geometry.center();
     }
   });
 
@@ -26,7 +25,6 @@ function CenteredNumber({ url }: { url: string }) {
 
   return (
     <group ref={groupRef}>
-      {/* Rotate the raw GLTF scene so it "faces forward" */}
       <primitive object={scene} scale={[3, 3, 3]} rotation={[0, Math.PI / 2, 0]} />
     </group>
   );
