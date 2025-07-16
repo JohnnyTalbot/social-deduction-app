@@ -18,9 +18,10 @@ interface GameAreaProps {
   updateRoomData: (partial: Partial<Room>) => void;
   setSelectedCharacter: (character: Player) => void;
   setOpenCharacter: (open: boolean) => void;
+  showRoles: boolean;
 }
 
-function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, updateRoomData, setSelectedCharacter, setOpenCharacter }: GameAreaProps) {
+function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, updateRoomData, setSelectedCharacter, setOpenCharacter, showRoles }: GameAreaProps) {
   const radius = 5;
   const center = new THREE.Vector3(0, 1.2, 0);
   const count = 12; // number of objects in the circle
@@ -122,6 +123,7 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
             roomData={roomData as Room}
             setSelectedCharacter={setSelectedCharacter}
             setOpenCharacter={setOpenCharacter}
+            showRoles={showRoles}
           />
           :
           <Plus

@@ -8,9 +8,6 @@ interface DashboardStorytellerProps {
   updatePlayerData: (partial: Partial<Player>) => void;
   updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
   updateVotingData: (partial: Partial<Room["votingData"]>) => void;
-  isStoryteller: boolean;
-  showRoles: boolean;
-  setShowRoles: (showRoles: boolean) => void;
   setOpenAssigns: (openAssigns: boolean) => void;
   className?: string;
 }
@@ -23,9 +20,6 @@ export default function DashboardStoryteller({
   updatePlayerData,
   updatePlayerById,
   updateVotingData,
-  isStoryteller,
-  showRoles,
-  setShowRoles,
   setOpenAssigns,
 }: DashboardStorytellerProps) {
   const room = roomData as Room;

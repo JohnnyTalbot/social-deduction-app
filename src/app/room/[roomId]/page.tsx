@@ -107,6 +107,7 @@ function RoomPage() {
         updatePlayerById={updatePlayerById}
         setSelectedCharacter={setSelectedCharacter}
         setOpenCharacter={setOpenCharacter}
+        showRoles={showRoles}
       />
       {playerData && roomData && (
         <>
@@ -138,9 +139,6 @@ function RoomPage() {
               updatePlayerById={updatePlayerById}
               updatePlayerData={updatePlayerData}
               updateVotingData={updateVotingData}
-              isStoryteller={playerData.isStoryteller}
-              showRoles={showRoles}
-              setShowRoles={setShowRoles}
               setOpenAssigns={setOpenAssigns}
             />}
           </div>

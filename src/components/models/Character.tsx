@@ -21,9 +21,10 @@ interface CharacterProps {
   roomData?: Room;
   setSelectedCharacter?: (character: Player) => void;
   setOpenCharacter?: (open: boolean) => void;
+  showRoles?: boolean;
 }
 
-export default function Character({ position, rotation, model, name, playerData, updatePlayerById, roomData, setSelectedCharacter, setOpenCharacter }: CharacterProps) {
+export default function Character({ position, rotation, model, name, playerData, updatePlayerById, roomData, setSelectedCharacter, setOpenCharacter, showRoles }: CharacterProps) {
   const modelPath = `/models/kenney/character-${model}.glb`;
 
   const [charHover, setCharHover] = useState(false)
@@ -67,10 +68,10 @@ export default function Character({ position, rotation, model, name, playerData,
   // isVoting arm raised:
   useLayoutEffect(() => {
     if (!clonedScene || !characterGroupRef.current) {
-        armRef.current = null; // Clear armRef if not ready
+        armRef.current = null;
         return;
     }
-    const foundArm = clonedScene.getObjectByName('arm-left'); // Search on the cloned object directly
+    const foundArm = clonedScene.getObjectByName('arm-left');
 
     if (foundArm) {
       armRef.current = foundArm;
@@ -84,7 +85,7 @@ export default function Character({ position, rotation, model, name, playerData,
 
     if (playerData.isVoting) {
       // Raise arm statically — adjust axis/values based on model orientation
-      armRef.current.rotation.x = -Math.PI / 2;
+      armRef.current.rotation.x = -Math.PI / 3;
       armRef.current.rotation.y = 0;
       armRef.current.rotation.z = 0;
     }
@@ -148,7 +149,7 @@ export default function Character({ position, rotation, model, name, playerData,
         </Text>
       )}
       {
-        playerData && playerData.role && (
+        playerData && playerData.role && showRoles == true && (
           <ImageCard url={`/assets/${playerData.role}.png`} />
         )
       }
