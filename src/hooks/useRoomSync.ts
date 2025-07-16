@@ -1,9 +1,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from 'react';
-import { ref, update, onValue, off, set } from 'firebase/database';
+import { ref, update, onValue, off, set, get } from 'firebase/database'; // Import 'get'
 import { db } from '@/lib/firebase';
 import { Player, Room, Seat } from '@/types/game';
 import { flushSync } from 'react-dom';
+// Removed 'get' from 'http' as it's incorrect and likely a typo
 
 export function useRoomSync(roomId: string) {
   const router = useRouter();
@@ -31,9 +32,13 @@ export function useRoomSync(roomId: string) {
   const updateVotingData = (partial: Partial<Room["votingData"]>) => {
     if (!roomId) return;
     const votingDataRef = ref(db, `rooms/${roomId}/votingData`);
-    // Ensure 'partial' is an object to satisfy Firebase `update` and TypeScript
     update(votingDataRef, partial || {});
   };
+
+  const getPlayerById = (playerId: string): Player | undefined => {
+    if (!roomDataRef.current || !roomDataRef.current.players) return undefined;
+    return roomDataRef.current.players[playerId];
+  }
 
   // --- Handlers for Game Logic ---
 
@@ -41,7 +46,6 @@ export function useRoomSync(roomId: string) {
     if (!roomData || !playerToKick?.seatNumber) return;
     if (!Array.isArray(roomData.seats)) return null;
 
-    // Remove from seat (optimistic update via local state for immediate feedback)
     const updatedSeats = roomData.seats.map(seat => {
       if (seat.playerId === playerToKick.id) {
         return { ...seat, playerId: '', isTaken: false };
@@ -49,7 +53,6 @@ export function useRoomSync(roomId: string) {
       return seat;
     });
 
-    // May remove flushSync in future:
     flushSync(() => {
       updateRoomData({ seats: updatedSeats });
     });
@@ -102,26 +105,34 @@ export function useRoomSync(roomId: string) {
       const votingOrder = getVotingSeatsInOrder(roomDataRef.current?.seats || [], startIndex);
       let currentIndex = 0;
 
-      const proceedToNextVoter = () => {
+      const proceedToNextVoter = async () => { // Make this function async
         const currentSeat = votingOrder[currentIndex];
 
         // Process votes from previously passed players if any
         if (currentIndex > 0) {
           const previouslyPassedSeats = votingOrder.slice(0, currentIndex);
+
+          // Crucial: Fetch the absolute latest room data before processing votes
+          const roomSnapshot = await get(ref(db, `rooms/${roomId}`));
+          const latestRoomData = roomSnapshot.val() as Room | null;
+
+          if (!latestRoomData) {
+            console.error("Could not fetch latest room data for vote processing.");
+            return;
+          }
+
           previouslyPassedSeats.forEach(seat => {
             const playerId = seat.playerId;
-            // Use roomDataRef.current to get the latest player state
-            const player = playerId ? roomDataRef.current?.players[playerId] : undefined;
+            // Use the *latestRoomData* for players and voting information
+            const player = playerId ? latestRoomData.players?.[playerId] : undefined;
 
             if (!playerId || !player) return;
 
-            // Only add vote if the player actively set isVoting to true and hasn't already voted
             if (player.isVoting) {
-              const currentVotes = roomDataRef.current?.votingData?.votes || {};
+              const currentVotes = latestRoomData.votingData?.votes || {}; // Use latestRoomData
               const existingVoters = currentVotes[currentNominated] || [];
 
               if (!existingVoters.includes(playerId)) {
-                console.log("Adding vote for player:", player.name);
                 const updatedVotes = {
                   ...currentVotes,
                   [currentNominated]: [...existingVoters, playerId],
@@ -135,9 +146,7 @@ export function useRoomSync(roomId: string) {
         }
 
         if (!currentSeat) {
-          // End voting
           console.log("Ending voting phase");
-          // Ensure all players who were voting have their state reset
           Object.entries(roomDataRef.current?.players || {}).forEach(([playerId, player]) => {
             if (player.isVoting) {
               updatePlayerById(playerId, {
@@ -147,7 +156,6 @@ export function useRoomSync(roomId: string) {
             }
           });
 
-          // Reset voting data in the room
           updateVotingData({
             phase: "nominations",
             currentNominated: "",
@@ -156,59 +164,51 @@ export function useRoomSync(roomId: string) {
           return;
         }
 
-        // Update current voting status for the room
         updateVotingData({
           phase: "voting",
           currentlyVoting: currentSeat,
         });
 
-        // Proceed to the next voter after a delay
         setTimeout(() => {
           currentIndex++;
           proceedToNextVoter();
         }, 3000);
       };
 
-      proceedToNextVoter(); // Start the voting sequence
+      proceedToNextVoter();
     };
 
-    // Helper function to get voting seats in order, using the latest player data
     function getVotingSeatsInOrder(seats: Seat[], startIndex: number): Seat[] {
       const canVote = (seat: Seat) =>
         seat.isTaken &&
         typeof seat.playerId === 'string' &&
-        // Crucial: Use roomDataRef.current for the latest player state
         roomDataRef.current?.players[seat.playerId]?.canVote;
 
       const orderedSeats = [...seats.slice(startIndex), ...seats.slice(0, startIndex)];
       return orderedSeats.filter(canVote);
     }
 
-    runCountdown(); // Initial call to start the countdown
+    runCountdown();
   };
 
   // --- Firebase Read Listeners (Updates Local State) ---
 
-  // Listen for current player data changes
-  // This listener is specific to the currently logged-in player
   useEffect(() => {
-    // Only set up if roomId and playerData.id are available
     if (!roomId || !playerData?.id) return;
 
     const playerRef = ref(db, `rooms/${roomId}/players/${playerData.id}`);
     const unsubscribePlayer = onValue(playerRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Merge incoming data with existing playerData state
         setPlayerData((prev) => prev ? { ...prev, ...data } : data);
       }
     });
 
-    // Cleanup listener on unmount or dependencies change
     return () => off(playerRef, 'value', unsubscribePlayer);
   }, [roomId, playerData?.id]);
 
-  // Listen for room data changes (all players, voting data, seats etc.)
+// Inside useRoomSync.ts
+
   useEffect(() => {
     if (!roomId) return;
 
@@ -216,13 +216,13 @@ export function useRoomSync(roomId: string) {
     const unsubscribeRoom = onValue(roomRef, (snapshot) => {
       const incomingRoom = snapshot.val();
       if (incomingRoom) {
+        console.log("Firebase 'onValue' fired. incomingRoom.votingData.votes:", incomingRoom.votingData?.votes); // <-- NEW LOG
         setRoomData((prev) => {
           if (!prev) {
             roomDataRef.current = incomingRoom;
             return incomingRoom;
           }
 
-          // Deep merge for players to preserve existing properties
           const mergedPlayers = { ...prev.players };
           for (const playerId in incomingRoom.players) {
             mergedPlayers[playerId] = {
@@ -231,14 +231,21 @@ export function useRoomSync(roomId: string) {
             };
           }
 
+          const newVotingData = {
+            ...(prev.votingData || {}),
+            ...(incomingRoom.votingData || {}),
+          };
+          if (incomingRoom.votingData && 'votes' in incomingRoom.votingData) {
+              newVotingData.votes = incomingRoom.votingData.votes;
+          } else {
+              newVotingData.votes = {};
+          }
+
           const newRoomData = {
             ...prev,
             ...incomingRoom,
             players: mergedPlayers,
-            votingData: {
-              ...prev.votingData,
-              ...incomingRoom.votingData,
-            },
+            votingData: newVotingData,
             seats: incomingRoom.seats || prev.seats,
           };
 
@@ -270,6 +277,7 @@ export function useRoomSync(roomId: string) {
     updateRoomData,
     updatePlayerData,
     updatePlayerById,
+    getPlayerById,
     updateVotingData,
     handleKickPlayer,
     handleStartVote

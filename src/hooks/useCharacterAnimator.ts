@@ -90,8 +90,6 @@ export function useCharacterAnimator(
 
       if (!updatePlayerById || !playerId) return;
 
-      console.log("done animating")
-
       updatePlayerById(playerId, {
         isAnimating: false,
         currentAnimation: ""

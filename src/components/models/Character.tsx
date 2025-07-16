@@ -55,8 +55,6 @@ export default function Character({ position, rotation, model, name, playerData,
     if (!isSceneReady || !playerData?.isAnimating || !playerData.currentAnimation) return;
     if (playerData?.isVoting) return;
 
-    console.log("playerData.isVoting:", playerData.isVoting);
-
     // Optional: prevent triggering same animation repeatedly
     // if (lastAnimationRef.current === playerData.currentAnimation) return;
     lastAnimationRef.current = playerData.currentAnimation;

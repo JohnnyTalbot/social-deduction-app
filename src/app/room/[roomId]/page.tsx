@@ -14,6 +14,7 @@ import ModelPreload from '@/components/ModelPreload';
 import PresenceWatcher from "./PresenceWatcher";
 import GameArea from "./GameArea";
 import PlayerList from "./PlayerList";
+import VoteList from "./VoteList";
 import DashboardStoryteller from "./DashboardStoryteller";
 import DashboardPlayer from "./DashboardPlayer";
 import CharacterSheet from "./CharacterSheet";
@@ -48,6 +49,7 @@ function RoomPage() {
     updateRoomData,
     updatePlayerData,
     updatePlayerById,
+    getPlayerById,
     updateVotingData,
     handleKickPlayer,
     handleStartVote
@@ -187,6 +189,28 @@ function RoomPage() {
               cardIndex={2}
               setOpenCard={setOpenCard}
               open={openCard == 2}
+              side='right'
+              className="text-2xl"
+              icon={<svg width="35" height="35" viewBox="0 0 26 36"fill="none" xmlns="http://www.w3.org/2000/svg" >
+                      <path d="M15.722 0C14.3151 0 13.1738 1.13804 13.1738 2.54203V9.33718H18.2735V2.54203C18.2735 1.13804 17.1321 0 15.722 0Z" fill="#51277D"/>
+                      <path d="M11.7035 3.85677V10.1173C11.2071 10.3925 10.8688 11.4631 10.8688 12.0709V13.3317C10.4167 13.7424 9.81278 13.9928 9.152 13.9928C7.74506 13.9928 6.6037 12.8547 6.6037 11.4509V3.85677C6.6037 2.45279 7.74506 1.31475 9.152 1.31475C10.5621 1.31475 11.7035 2.45279 11.7035 3.85677Z" fill="#51277D"/>
+                      <path d="M24.879 9.39313V3.85677C24.879 2.45279 23.7377 1.31475 22.3276 1.31475C20.9206 1.31475 19.7793 2.45279 19.7793 3.85677V9.33718H24.2752C24.4807 9.33718 24.683 9.35629 24.879 9.39313Z" fill="#51277D"/>
+                      <path d="M2.5483 3.52169C1.14136 3.52169 0 4.65973 0 6.06371V11.4509C0 12.8547 1.14136 13.9928 2.5483 13.9928C3.9584 13.9928 5.09976 12.8547 5.09976 11.4509V6.06371C5.09976 4.65973 3.9584 3.52169 2.5483 3.52169Z" fill="#51277D"/>
+                      <path d="M20.6077 34.25C20.6077 34.8023 20.16 35.25 19.6077 35.25H5.1892C4.63691 35.25 4.1892 34.8023 4.1892 34.25V29.0181L4.17318 28.9931C4.17318 27.3724 2.86435 26.0281 1.87499 25.012C1.78052 24.915 1.68894 24.8209 1.60172 24.7299C0.600975 23.6859 0.211831 22.7294 0.211831 21.0046V15.463C0.798902 16.0578 1.6158 16.4267 2.51984 16.4267H3.00358C4.32199 16.4267 5.45702 15.6389 5.96289 14.5093C6.46559 15.6389 7.60379 16.4267 8.92536 16.4267H9.4091C10.1214 16.4267 10.7804 16.1969 11.3154 15.8075C11.826 16.9279 12.7523 17.82 13.8979 18.2883C13.8493 18.3254 13.801 18.3632 13.753 18.4016C11.9782 19.822 10.5987 22.1214 10.6943 25.4414C10.7135 26.1096 11.2724 26.6357 11.9427 26.6166C12.6129 26.5974 13.1406 26.0402 13.1214 25.372C13.0486 22.8438 14.0644 21.2565 15.273 20.2894C16.0932 19.633 17.0043 19.2606 17.7537 19.093C18.3132 18.9678 18.8068 18.5073 18.8148 17.934L18.8193 17.6144C18.8271 17.0567 18.3772 16.6004 17.8194 16.6004H16.1067C14.3187 16.6004 12.8692 15.1554 12.8692 13.3729C12.8692 12.2347 13.8092 11.382 15.2466 11.382H22.4137C24.0632 11.382 25.5605 12.4546 25.5605 14.4287C25.5356 16.6419 25.5213 18.2685 25.5832 19.378L25.589 19.4814C25.686 21.2137 25.7571 22.482 24.4886 23.9412C24.1283 24.3556 23.6676 24.7855 23.1904 25.2308C21.9544 26.3841 20.6077 27.6407 20.6077 29.0006V34.25Z" fill="#51277D"/>
+                    </svg>}
+                    >
+              <VoteList 
+                roomData={roomData}
+                getPlayerById={getPlayerById}
+                updateVotingData={updateVotingData}
+                isStoryteller={currentPlayer.isStoryteller}
+              />
+            </CardSide>
+
+            <CardSide 
+              cardIndex={3}
+              setOpenCard={setOpenCard}
+              open={openCard == 3}
               side='right'
               className="text-2xl"
               icon={<svg width="35" height="35" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
