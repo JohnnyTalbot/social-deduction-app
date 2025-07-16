@@ -13,7 +13,10 @@ export default function Home() {
       <div>
         <h1 className='text-8xl text-purple-dark text-center'>Blood on the Clocktower</h1>
       </div>
-      <Card className="relative flex flex-col justify-center items-center gap-10 px-20 py-20">
+      <Card 
+        className="relative flex flex-col justify-center items-center gap-10"
+        padding='60px'
+        >
         <Link href="/create">
           <Button className='w-[250px]'>
             <p className='text-5xl'>Create Room</p>

@@ -10,13 +10,7 @@ export function useRoomSync(roomId: string) {
   const [roomData, setRoomData] = useState<Room>();
   const [playerData, setPlayerData] = useState<Player>();
 
-  // Ref to store the latest roomData, to avoid stale closures in async operations
   const roomDataRef = useRef<Room | undefined>(undefined);
-
-  // --- Firebase Write Operations (Directly to DB) ---
-  // These functions now directly update Firebase.
-  // The local state (`roomData`, `playerData`) will be updated
-  // automatically by the `onValue` listeners.
 
   const updateRoomData = (partial: Partial<Room>) => {
     if (!roomId) return;
@@ -24,7 +18,6 @@ export function useRoomSync(roomId: string) {
   };
 
   const updatePlayerData = (partial: Partial<Player>) => {
-    // Note: playerData?.id is used here to identify the current player for update
     if (!roomId || !playerData?.id) return;
     update(ref(db, `rooms/${roomId}/players/${playerData.id}`), partial);
   };
@@ -45,7 +38,6 @@ export function useRoomSync(roomId: string) {
   // --- Handlers for Game Logic ---
 
   const handleKickPlayer = (playerToKick: Player) => {
-    // It's good practice to ensure roomData and playerToKick are available
     if (!roomData || !playerToKick?.seatNumber) return;
     if (!Array.isArray(roomData.seats)) return null;
 
@@ -57,15 +49,11 @@ export function useRoomSync(roomId: string) {
       return seat;
     });
 
-    // Use flushSync if you need the UI to update synchronously before a Firebase write
-    // However, since updateRoomData now writes to Firebase, and onValue will update local state,
-    // this flushSync might not be strictly necessary or might even lead to a brief double-render.
-    // Consider if you truly need synchronous UI update before Firebase reflects the change.
+    // May remove flushSync in future:
     flushSync(() => {
-      updateRoomData({ seats: updatedSeats }); // This now writes to Firebase directly
+      updateRoomData({ seats: updatedSeats });
     });
 
-    // Update player info in Firebase
     updatePlayerById(playerToKick.id, {
       isSeated: false,
       wasKicked: true
@@ -78,8 +66,7 @@ export function useRoomSync(roomId: string) {
       return;
     }
 
-    // Check roomData existence. The actual voting logic will use the ref.
-    if (!roomDataRef.current) { // Use the ref for consistency
+    if (!roomDataRef.current) {
       alert("Room data not loaded yet.");
       return;
     }
@@ -96,7 +83,6 @@ export function useRoomSync(roomId: string) {
     let countdown = 3;
 
     const runCountdown = () => {
-      // Use updateVotingData which writes directly to Firebase
       updateVotingData({
         phase: "countdown",
         countdown,
@@ -113,7 +99,6 @@ export function useRoomSync(roomId: string) {
     };
 
     const beginVoting = (startIndex: number) => {
-      // `getVotingSeatsInOrder` now relies on roomDataRef.current for latest player data
       const votingOrder = getVotingSeatsInOrder(roomDataRef.current?.seats || [], startIndex);
       let currentIndex = 0;
 
@@ -125,7 +110,7 @@ export function useRoomSync(roomId: string) {
           const previouslyPassedSeats = votingOrder.slice(0, currentIndex);
           previouslyPassedSeats.forEach(seat => {
             const playerId = seat.playerId;
-            // Crucial: Use roomDataRef.current to get the latest player state
+            // Use roomDataRef.current to get the latest player state
             const player = playerId ? roomDataRef.current?.players[playerId] : undefined;
 
             if (!playerId || !player) return;
@@ -154,8 +139,7 @@ export function useRoomSync(roomId: string) {
           console.log("Ending voting phase");
           // Ensure all players who were voting have their state reset
           Object.entries(roomDataRef.current?.players || {}).forEach(([playerId, player]) => {
-            if (player.isVoting) { // Check the latest state from the ref
-              console.log("Resetting player voting state for:", player.name);
+            if (player.isVoting) {
               updatePlayerById(playerId, {
                 isVoting: false,
                 canVote: player.isAlive ? player.canVote : false,
@@ -222,7 +206,7 @@ export function useRoomSync(roomId: string) {
 
     // Cleanup listener on unmount or dependencies change
     return () => off(playerRef, 'value', unsubscribePlayer);
-  }, [roomId, playerData?.id]); // Re-run if roomId or playerData.id changes
+  }, [roomId, playerData?.id]);
 
   // Listen for room data changes (all players, voting data, seats etc.)
   useEffect(() => {
@@ -234,38 +218,38 @@ export function useRoomSync(roomId: string) {
       if (incomingRoom) {
         setRoomData((prev) => {
           if (!prev) {
-            roomDataRef.current = incomingRoom; // Initialize ref on first data load
+            roomDataRef.current = incomingRoom;
             return incomingRoom;
           }
 
-          // Deep merge for players to preserve existing properties like 'isVoting'
+          // Deep merge for players to preserve existing properties
           const mergedPlayers = { ...prev.players };
           for (const playerId in incomingRoom.players) {
             mergedPlayers[playerId] = {
-              ...(prev.players?.[playerId] || {}), // Take previous player state
-              ...incomingRoom.players[playerId], // Overlay with incoming player state
+              ...(prev.players?.[playerId] || {}),
+              ...incomingRoom.players[playerId],
             };
           }
 
           const newRoomData = {
-            ...prev, // Keep previous properties not in incomingRoom (e.g., if a sub-path wasn't updated)
-            ...incomingRoom, // Apply new top-level properties
-            players: mergedPlayers, // Use the carefully merged players
-            votingData: { // Ensure votingData is also deeply merged
+            ...prev,
+            ...incomingRoom,
+            players: mergedPlayers,
+            votingData: {
               ...prev.votingData,
               ...incomingRoom.votingData,
             },
-            seats: incomingRoom.seats || prev.seats, // seats might be an array, replace directly or handle carefully
+            seats: incomingRoom.seats || prev.seats,
           };
 
-          roomDataRef.current = newRoomData; // Always update the ref with the latest data
+          roomDataRef.current = newRoomData;
           return newRoomData;
         });
       }
     });
 
     return () => off(roomRef, 'value', unsubscribeRoom);
-  }, [roomId]); // Re-run if roomId changes
+  }, [roomId]);
 
   // --- Side Effects based on Player Data ---
 
@@ -274,14 +258,13 @@ export function useRoomSync(roomId: string) {
       alert("You were removed from the game.");
       router.push('/join')
     }
-  }, [playerData, router]); // Add router to dependencies if it could change
+  }, [playerData, router]);
 
   // --- Return Values ---
 
   return {
     roomData,
     playerData,
-    // Exposed functions for direct Firebase writes
     setRoomData,
     setPlayerData,
     updateRoomData,
