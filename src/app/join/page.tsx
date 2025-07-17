@@ -73,15 +73,14 @@ function JoinRoom() {
   };
 
   return(
-    <div className='flex flex-row gap-10 justify-center items-center w-full h-screen'>
+    <div className='flex flex-row gap-5 lg:gap-10 justify-center items-center w-full h-screen'>
       <Link href="/">
-        <Button className='absolute top-5 right-5 text-5xl'>Back</Button>
+        <Button className='absolute top-2 right-2 lg:top-5 lg:right-5 text-2xl lg:text-5xl px-4'>Back</Button>
       </Link>
 
-      <Card className='flex flex-col justify-center items-center w-[400px] h-[500px] gap-5'>
-        <h1 className='text-5xl'>Select Character</h1>
-        <Canvas 
-          className='w-[400px] h-[400px]' 
+      <Card className='flex flex-col justify-center items-center w-[200px] h-[260px] lg:w-[400px] lg:h-[500px] gap-5 p-2 lg:p-15 '>
+        <h1 className='text-2xl lg:text-5xl'>Select Character</h1>
+        <Canvas  
           camera={{ position: [0, 15, 0], fov: 15 }}
         >
           <ambientLight intensity={1} />
@@ -96,16 +95,16 @@ function JoinRoom() {
         </Canvas>
         <div className='flex flex-row gap-5 justify-center items-center w-full noselect'>
           <svg 
-            className='cursor-pointer'
+            className='w-[24px] lg:w-[27px] cursor-pointer'
             onClick={() =>
               setSelectedModel((prev) => (prev - 1 < 0 ? models.length - 1 : prev - 1))
             } 
             width="27" height="18" viewBox="0 0 27 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.048 2.561C10.6343 1.97513 10.6343 1.02526 10.048 0.439398C9.46164 -0.146466 8.511 -0.146466 7.92467 0.439397L0.439749 7.91707C-0.146583 8.50293 -0.146583 9.4528 0.439749 10.0387L7.94791 17.5606C8.53424 18.1465 9.48488 18.1465 10.0712 17.5606C10.6575 16.9747 10.6575 16.0249 10.0712 15.439L5.1261 10.4781L25.582 10.4781C26.3651 10.4781 27 9.8064 27 8.97787C27 8.14933 26.3651 7.47767 25.582 7.47767L5.1261 7.47767L10.048 2.561Z" fill="#31154F"/>
           </svg>
-          <p className='text-3xl'>{models[selectedModel]}</p>
+          <p className='text-xl lg:text-3xl'>{models[selectedModel]}</p>
           <svg 
-            className='cursor-pointer'
+            className='w-[24px] lg:w-[27px] cursor-pointer'
             onClick={() =>
               setSelectedModel((prev) => (prev + 1 >= models.length ? 0 : prev + 1))
             } 
@@ -115,14 +114,14 @@ function JoinRoom() {
         </div>
       </Card>
 
-      <Card className='flex flex-col justify-center items-center w-[500px] h-[500px] gap-5'>
+      <Card className='flex flex-col justify-center items-center w-[260px] h-[260px] lg:w-[500px] lg:h-[500px] gap-5 p-10 lg:p-15 '>
         <TextInput 
-          className='text-5xl'
+          className='text-2xl lg:text-5xl'
           onChange={(e) => {setName(e.target.value)}} 
           placeholder="Your Name..."
           />
         <TextInput 
-          className='text-5xl'
+          className='text-2xl lg:text-5xl'
           onChange={(e) => {setRoomId(e.target.value)}}
           placeholder="Room Code..."
         />
@@ -130,10 +129,10 @@ function JoinRoom() {
           <p className='text-3xl'>Entering Room...</p>
           :
           <Button 
-            className='w-[250px] py-5'
+            className='w-[160px] lg:w-[250px] py-3 lg:py-5'
             onClick={joinRoom}
             >
-            <p className='text-5xl'>Enter Room</p>
+            <p className='text-2xl lg:text-5xl'>Enter Room</p>
           </Button>
         }
       </Card>

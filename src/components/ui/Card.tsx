@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 
 interface CardProps {
   bgColor?: string;
-  padding?: string;
 }
 
-export function Card({ children, className = '', bgColor="#D1BB87", padding="20px", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ children, className = '', bgColor="#D1BB87", ...props }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={`${className}`}
@@ -14,7 +13,6 @@ export function Card({ children, className = '', bgColor="#D1BB87", padding="20p
         border: '3px solid #000000',
         boxShadow: '-5px 5px 0px #000000',
         borderRadius: '30px',
-        padding: padding,
         backgroundColor: bgColor,
       }}
       {...props}

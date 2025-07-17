@@ -73,11 +73,11 @@ function CreateRoom() {
   return(
     <div className='flex flex-row justify-center items-center w-full h-screen'>
       <Link href="/">
-        <Button className='absolute top-5 right-5 text-5xl'>Back</Button>
+        <Button className='absolute top-2 right-2 lg:top-5 lg:right-5 text-2xl lg:text-5xl px-4'>Back</Button>
       </Link>
-      <Card className='flex flex-col justify-center items-center w-[500px] h-[500px] gap-5'>
+      <Card className='flex flex-col justify-center items-center gap-5 px-10 py-15 lg:px-18 lg:py-32 '>
         <TextInput 
-          className='text-5xl'
+          className='text-2xl lg:text-5xl'
           onChange={(e) => {setName(e.target.value)}} 
           placeholder="Your Name..."
           />
@@ -85,10 +85,10 @@ function CreateRoom() {
           <p className='text-3xl'>Creating Room...</p>
           :
           <Button 
-            className='w-[250px] py-5'
+            className='w-[160px] lg:w-[250px] py-3 lg:py-5'
             onClick={createRoom}
             >
-            <p className='text-5xl'>Create Room</p>
+            <p className='text-2xl lg:text-5xl'>Create Room</p>
           </Button>
         }
       </Card>

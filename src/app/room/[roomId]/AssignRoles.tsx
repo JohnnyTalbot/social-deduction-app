@@ -138,9 +138,8 @@ function AssignRoles({script, selectedRoles, setSelectedRoles, updatePlayerById,
                 onMouseMove={(e) => handleMouseMove(e,( role.description || ''))}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => toggleRoleSelect(role)}
-                className={`flex flex-col justify-center items-center w-[120px] h-[120px] relative cursor-pointer ${selectedRoles.some(r => r.name === role.name) ? '' : 'opacity-50'}`}
+                className={`flex flex-col justify-center items-center w-[120px] h-[120px] p-1 relative cursor-pointer ${selectedRoles.some(r => r.name === role.name) ? '' : 'opacity-50'}`}
                 bgColor={value.color}
-                padding="5px"
               >
                 <Image
                   width={75}

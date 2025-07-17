@@ -17,8 +17,8 @@ const models = [
   'number-1',
   'number-2',
   'number-3',
-  'indicator-square',
-  'banner.glb',
+  'indicator-square-b',
+  'banner',
 ];
 models.forEach((model) => {
   useGLTF.preload(`/models/kenney/${model}.glb`);
