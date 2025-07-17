@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Room, Player } from '@/types/game';
+import { Room } from '@/types/game';
 
 interface DashboardStorytellerProps {
   roomData: Room | unknown;

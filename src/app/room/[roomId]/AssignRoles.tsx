@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Tooltip } from '@/components/Tooltip';
 
-import { Script, Role, Room, Player } from '@/types/game';
+import { Script, Role, Player } from '@/types/game';
 
 interface AssignRolesProps{
   script: Script;
