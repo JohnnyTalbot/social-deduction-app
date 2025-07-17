@@ -98,7 +98,7 @@ export function CardSide(
           className={`flex ${side === 'left' ? 'justify-end' : 'justify-start'} w-auto`}
         >
           <div
-            className="inline-flex p-5 cursor-pointer"
+            className="inline-flex pb-2 lg:pb-5 p-5 cursor-pointer"
             onClick={() => {
               if (isLinked) {
                 setOpenCard?.(0);
@@ -107,7 +107,7 @@ export function CardSide(
               }
             }}
           >
-            <svg width="30" height="5" viewBox="0 0 30 5" fill="none">
+            <svg className='w-[22px] lg:w-[30px]' width="30" height="5" viewBox="0 0 30 5" fill="none">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -120,7 +120,7 @@ export function CardSide(
 
       ) : (
         <div
-          className={`flex ${side === 'left' ? 'justify-end' : 'justify-start'} p-5 cursor-pointer`}
+          className={`flex ${side === 'left' ? 'justify-end pr-3' : 'justify-start pl-3'} p-3 lg:p-5 cursor-pointer`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
           onClick={() => {
@@ -158,7 +158,7 @@ interface CardPopupProps {
 
 export function CardPopup({title='', open, setOpen, children, className = '', ...props }: CardPopupProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`${open ? '' : 'hidden'} absolute w-full h-screen flex justify-center items-center px-[50px] py-[50px]`}>
+    <div className={`${open ? '' : 'hidden'} absolute w-full h-screen flex justify-center items-center px-[30px] py-[20px] lg:px-[50px] lg:py-[50px]`}>
       <div 
         className="absolute w-full h-screen z-1"
         onClick={() => {
@@ -180,7 +180,7 @@ export function CardPopup({title='', open, setOpen, children, className = '', ..
           className={`flex items-center justify-between w-auto`}
         >
           <div>
-            <p className='text-5xl text-[#51277D]'>{title}</p>
+            <p className='text-2xl lg:text-5xl text-[#51277D]'>{title}</p>
           </div>
           <div
             className="p-2 cursor-pointer"
@@ -188,7 +188,7 @@ export function CardPopup({title='', open, setOpen, children, className = '', ..
               setOpen(false)
             }}
           >
-            <svg className="cursor-pointer" width="25" height="25" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-[16px] lg:w-[25px] cursor-pointer" width="25" height="25" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" clipRule="evenodd" d="M0.389165 0.396985C0.907962 -0.119475 1.74899 -0.119372 2.26766 0.397215L7.46409 5.56937L12.6671 0.387816C13.1856 -0.128942 14.0266 -0.12932 14.5456 0.386971C15.0646 0.903261 15.0649 1.74071 14.5464 2.25747L9.34236 7.4401L14.6111 12.7422C15.1297 13.2588 15.1296 14.0963 14.6108 14.6127C14.092 15.1292 13.251 15.1291 12.7323 14.6125L7.46471 9.31145L2.31188 14.5723C1.79338 15.089 0.95235 15.0894 0.433382 14.5731C-0.0855855 14.0568 -0.0859656 13.2194 0.432533 12.7026L5.58644 7.44072L0.388934 2.26748C-0.129735 1.7509 -0.129632 0.913446 0.389165 0.396985Z" fill="#F54242"/>
             </svg>
           </div>

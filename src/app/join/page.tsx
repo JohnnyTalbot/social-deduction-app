@@ -73,7 +73,7 @@ function JoinRoom() {
   };
 
   return(
-    <div className='flex flex-row gap-5 lg:gap-10 justify-center items-center w-full h-screen'>
+    <div className='flex flex-col sm:flex-row gap-5 lg:gap-10 justify-center items-center w-full h-screen'>
       <Link href="/">
         <Button className='absolute top-2 right-2 lg:top-5 lg:right-5 text-2xl lg:text-5xl px-4'>Back</Button>
       </Link>
@@ -126,7 +126,7 @@ function JoinRoom() {
           placeholder="Room Code..."
         />
         {isEntering ?
-          <p className='text-3xl'>Entering Room...</p>
+          <p className='text-2xl lg:text-3xl'>Entering Room...</p>
           :
           <Button 
             className='w-[160px] lg:w-[250px] py-3 lg:py-5'

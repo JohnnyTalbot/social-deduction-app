@@ -20,10 +20,9 @@ interface SelectedCharacterProps{
 
 function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, updateVotingData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
   return(
-    <div className="w-full h-full flex flex-row gap-5">
-      <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
+    <div className="w-full h-full flex flex-row justify-around items-center gap-2 lg:gap-5">
+      <div className="flex flex-col w-[200px] h-[200px] lg:w-[400px] lg:h-[400px]">
         <Canvas 
-          className='w-[400px] h-[400px]' 
           camera={{ position: [0, 15, 0], fov: 15 }}
         >
           <ambientLight intensity={1} />
@@ -43,8 +42,9 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, up
       </div>
       {
       isStoryteller &&
-      <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
+      <div className="flex flex-col justify-center items-center">
         <Button
+          className='px-5 py-3 lg:py-5 lg:px-8'
           onClick={() => {
             if (!selectedCharacter) return;
 
@@ -52,14 +52,15 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, up
             setOpenCharacter(false)
           }}
         >
-          Kick Player
+          <p className='text-xl lg:text-3xl'>Kick Player</p>
         </Button>
       </div>
       }
       {
       !isStoryteller &&
-      <div className="flex flex-col justify-center items-center w-[400px] h-[500px]">
+      <div className="flex flex-col justify-center items-center">
         <Button
+          className='px-5 py-3 lg:py-5 lg:px-8'
           onClick={() => {
             if (!selectedCharacter) return;
 
@@ -76,7 +77,7 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, up
             });
           }}
         >
-          Nominate Player
+          <p className='text-xl lg:text-3xl'>Nominate Player</p>
         </Button>
       </div>
       }

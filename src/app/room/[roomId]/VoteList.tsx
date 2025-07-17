@@ -10,8 +10,8 @@ interface VoteListProps {
 function VoteList({ roomData, getPlayerById, updateVotingData, isStoryteller }: VoteListProps) {
 
   return (
-    <div className="w-[250px] h-[200px] px-5 overflow-y-scroll custom-scrollbar">
-      <div className="flex flex-row justify-between items-center mb-3">
+    <div className="w-[150px] h-[140px] lg:w-[250px] lg:h-[200px] pr-2 lg:pr-5 pl-5 overflow-y-scroll custom-scrollbar text-base lg:text-2xl">
+      <div className="flex flex-row justify-between items-center lg:mb-3">
         <p className="text-[#51277D] font-bold">Vote List</p>
         {isStoryteller && (
           <button
@@ -27,7 +27,7 @@ function VoteList({ roomData, getPlayerById, updateVotingData, isStoryteller }: 
         Object.entries(roomData.votingData.votes).map(([playerId, voteList]) => {
           const player = getPlayerById(playerId);
           return (
-            <div key={playerId} className="flex flex-row gap-3 items-center">
+            <div key={playerId} className="flex flex-row gap-2 items-center">
               <p className="text-[#51277D]">{player?.name} :</p>
               <p className="text-[#565656]">{voteList.length} votes</p>
               {/* {voteList.length > 0 && (

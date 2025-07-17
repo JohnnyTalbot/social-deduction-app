@@ -44,11 +44,11 @@ export default function DashboardStoryteller({
 
   return (
     <div className="m-2">
-      <div className="flex justify-center text-2xl h-[35px]">{getLabel()}</div>
+      <div className="flex justify-center text-lg lg:text-2xl h-[25px] lg:h-[35px]">{getLabel()}</div>
 
       {isStoryteller && (
         <div
-          className={`flex flex-row justify-center items-center gap-6 bg-card p-5 ${className}`}
+          className={`flex flex-row justify-center items-center gap-4 lg:gap-6 bg-card p-3 lg:p-5 ${className}`}
           style={{
             boxSizing: "border-box",
             border: "3px solid #000000",
@@ -65,6 +65,7 @@ export default function DashboardStoryteller({
             {room.currentPhase !== "night" ? (
               <svg
                 onClick={() => updateRoomData({ currentPhase: "night" })}
+                className='w-[23px] h-[23px] lg:w-[30px] lg:h-[30px]'
                 width="30"
                 height="30"
                 viewBox="0 0 30 30"
@@ -76,6 +77,7 @@ export default function DashboardStoryteller({
             ) : (
               <svg
                 onClick={() => updateRoomData({ currentPhase: "day" })}
+                className='w-[23px] h-[23px] lg:w-[30px] lg:h-[30px]'
                 width="30"
                 height="30"
                 viewBox="0 0 35 35"
@@ -104,6 +106,7 @@ export default function DashboardStoryteller({
             {showRoles ? (
               <svg
                 onClick={() => setShowRoles(false)}
+                className='w-[28px] h-[23px] lg:w-[40px] lg:h-[30px]'
                 width="40"
                 height="30"
                 viewBox="0 0 40 30"
@@ -116,6 +119,7 @@ export default function DashboardStoryteller({
             ) : (
               <svg
                 onClick={() => setShowRoles(true)}
+                className='w-[28px] h-[23px] lg:w-[40px] lg:h-[30px]'
                 width="40"
                 height="30"
                 viewBox="0 0 40 30"
@@ -139,6 +143,7 @@ export default function DashboardStoryteller({
               onClick={() => {
                 handleStartVote(room.votingData?.currentNominated ?? "");
               }}
+              className='w-[20px] h-[25px] lg:w-[26px] lg:h-[36px]'
               width="26"
               height="36"
               viewBox="0 0 26 36"
@@ -161,6 +166,7 @@ export default function DashboardStoryteller({
           >
             <svg
               onClick={() => setOpenAssigns(true)}
+              className='w-[23px] h-[23px] lg:w-[35px] lg:h-[35px]'
               width="33"
               height="33"
               viewBox="0 0 33 33"
