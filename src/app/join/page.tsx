@@ -125,13 +125,13 @@ function JoinRoom() {
           placeholder="Room Code..."
         />
         {isEntering ?
-          <p className='text-2xl lg:text-3xl'>Entering Room...</p>
+          <p className='text-center text-2xl lg:text-3xl'>Entering Room...</p>
           :
           <Button 
             className='w-[160px] lg:w-[250px] py-3 lg:py-5'
             onClick={joinRoom}
             >
-            <p className='text-2xl lg:text-5xl'>Enter Room</p>
+            <p className='text-center text-2xl lg:text-5xl'>Enter Room</p>
           </Button>
         }
       </Card>

@@ -1,31 +1,37 @@
 "use client";
 import Link from 'next/link';
+import { useRealViewportHeight } from '@/hooks/useRealViewportHeight';
 
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ModelPreload from '@/components/ModelPreload';
 
 export default function Home() {
+  useRealViewportHeight();
 
   return (
-    <div className="flex flex-col justify-between items-center w-full h-screen">
+    <div 
+      className="flex flex-col justify-between items-center w-full"
+      style={{ height: 'calc(var(--vh, 1vh) * 100)' }}
+    >
       <ModelPreload />
       <div>
         <h1 className='text-5xl lg:text-8xl text-purple-dark text-center'>Blood on the Clocktower</h1>
+        <p className='text-xl lg:text-3xl text-purple-dark text-center'>Beta Release</p>
       </div>
       <Card 
         className="relative flex flex-col justify-center items-center gap-5 lg:gap-10 p-10 lg:p-15 "
       >
         <Link href="/create">
           <Button className='w-[180px] lg:w-[250px]'>
-            <p className='text-2xl lg:text-5xl'>Create Room</p>
-            <p className='text-lg lg:text-2xl'> (Storyteller)</p>
+            <p className='text-center text-2xl lg:text-5xl'>Create Room</p>
+            <p className='text-center text-lg lg:text-2xl'> (Storyteller)</p>
           </Button>
         </Link>
         <Link href="/join">
           <Button className='w-[180px] lg:w-[250px]'>
-            <p className='text-2xl lg:text-5xl'>Join Room</p>
-            <p className='text-lg lg:text-2xl'>(Player)</p>
+            <p className='text-center text-2xl lg:text-5xl'>Join Room</p>
+            <p className='text-center text-lg lg:text-2xl'>(Player)</p>
           </Button>
         </Link>
         <div className='absolute w-full flex justify-end bottom-0 right-0 p-5'>

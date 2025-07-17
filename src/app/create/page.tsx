@@ -82,13 +82,13 @@ function CreateRoom() {
           placeholder="Your Name..."
           />
         {isCreating ?
-          <p className='text-2xl lg:text-3xl'>Creating Room...</p>
+          <p className='text-center text-2xl lg:text-3xl'>Creating Room...</p>
           :
           <Button 
             className='w-[160px] lg:w-[250px] py-3 lg:py-5'
             onClick={createRoom}
             >
-            <p className='text-2xl lg:text-5xl'>Create Room</p>
+            <p className='text-center text-2xl lg:text-5xl'>Create Room</p>
           </Button>
         }
       </Card>
