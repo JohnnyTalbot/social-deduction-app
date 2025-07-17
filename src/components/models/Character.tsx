@@ -1,15 +1,13 @@
-import { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
-import { useGLTF, Text } from '@react-three/drei';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import {Text } from '@react-three/drei';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
-import { SkeletonUtils } from 'three-stdlib';
 
 import { useClonedGLTF } from '@/hooks/useClonedGLTF';
 import { useCharacterAnimator } from '@/hooks/useCharacterAnimator';
 
 import { Player, Room } from '@/types/game';
-import { update } from 'firebase/database';
 
 interface CharacterProps {
   position: [number, number, number];

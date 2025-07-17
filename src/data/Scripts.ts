@@ -1,4 +1,4 @@
-import { Script, RoleType, Role } from '@/types/game';
+import { Script } from '@/types/game';
 
 export const TroubleBrewing : Script = {
   name: 'trouble brewing',

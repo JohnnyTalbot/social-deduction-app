@@ -1,5 +1,3 @@
-import type { Timestamp } from "firebase/firestore";
-
 export interface Player {
   id: string;
   name: string;

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ref, set, onDisconnect, onValue, off, update, remove } from 'firebase/database';
+import { ref, set, onDisconnect, onValue, update, remove } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { Player } from '@/types/game';
 
@@ -30,7 +30,7 @@ export function usePresence(roomId: string, playerId: string, playerData?: Playe
 
     const unsubscribePresence = onValue(allTabsRef, async (snapshot) => {
       const isOnline = snapshot.exists();
-      const updates: Record<string, any> = {
+      const updates: Record<string, unknown> = {
         loadState: isOnline ? "ready" : "offline",
         state: isOnline ? "online" : "offline",
         last_changed: Date.now(),

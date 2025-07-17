@@ -1,10 +1,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from 'react';
-import { ref, update, onValue, off, set, get } from 'firebase/database'; // Import 'get'
+import { ref, update, onValue, off, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { Player, Room, Seat } from '@/types/game';
 import { flushSync } from 'react-dom';
-// Removed 'get' from 'http' as it's incorrect and likely a typo
 
 export function useRoomSync(roomId: string) {
   const router = useRouter();
@@ -105,14 +104,12 @@ export function useRoomSync(roomId: string) {
       const votingOrder = getVotingSeatsInOrder(roomDataRef.current?.seats || [], startIndex);
       let currentIndex = 0;
 
-      const proceedToNextVoter = async () => { // Make this function async
+      const proceedToNextVoter = async () => {
         const currentSeat = votingOrder[currentIndex];
 
-        // Process votes from previously passed players if any
         if (currentIndex > 0) {
           const previouslyPassedSeats = votingOrder.slice(0, currentIndex);
 
-          // Crucial: Fetch the absolute latest room data before processing votes
           const roomSnapshot = await get(ref(db, `rooms/${roomId}`));
           const latestRoomData = roomSnapshot.val() as Room | null;
 
@@ -123,13 +120,12 @@ export function useRoomSync(roomId: string) {
 
           previouslyPassedSeats.forEach(seat => {
             const playerId = seat.playerId;
-            // Use the *latestRoomData* for players and voting information
             const player = playerId ? latestRoomData.players?.[playerId] : undefined;
 
             if (!playerId || !player) return;
 
             if (player.isVoting) {
-              const currentVotes = latestRoomData.votingData?.votes || {}; // Use latestRoomData
+              const currentVotes = latestRoomData.votingData?.votes || {};
               const existingVoters = currentVotes[currentNominated] || [];
 
               if (!existingVoters.includes(playerId)) {
@@ -206,8 +202,6 @@ export function useRoomSync(roomId: string) {
 
     return () => off(playerRef, 'value', unsubscribePlayer);
   }, [roomId, playerData?.id]);
-
-// Inside useRoomSync.ts
 
   useEffect(() => {
     if (!roomId) return;

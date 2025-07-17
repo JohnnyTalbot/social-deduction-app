@@ -69,12 +69,12 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
       {room.currentPhase != "night" && <directionalLight color={"yellow"} position={[0, 20, 0]} />}
       <Table />
       
-      // Voting Phase
+      {/* Voting Phase */}
       {room.votingData?.phase === "countdown" && (
         <Countdown countdown={room.votingData.countdown || 0} />
       )}
 
-      // Voting Arrow for currently voting player
+      {/* Voting Arrow for currently voting player */}
       {room.votingData?.currentlyVoting && !(room.votingData?.phase == "nominations") && (() => {
         const seat = room.seats.find(s => s.number === room.votingData?.currentlyVoting?.number)
         if (!seat || !seat.isTaken || !seat.playerId) return null;

@@ -7,7 +7,6 @@ import { ref, get, set } from 'firebase/database';
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 import Character from '@/components/models/Character';
 
 import { Player } from '@/types/game';

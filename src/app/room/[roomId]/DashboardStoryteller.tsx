@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Room, Player, Seat } from '@/types/game';
+import { Room, Player } from '@/types/game';
 
 interface DashboardStorytellerProps {
   roomData: Room | unknown;
   updateRoomData: (partial: Partial<Room>) => void;
-  updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
   handleStartVote: (currentNominated: string) => void;
   isStoryteller: boolean;
   showRoles: boolean;
@@ -17,7 +16,6 @@ export default function DashboardStoryteller({
   className,
   roomData,
   updateRoomData,
-  updatePlayerById,
   handleStartVote,
   isStoryteller,
   showRoles,

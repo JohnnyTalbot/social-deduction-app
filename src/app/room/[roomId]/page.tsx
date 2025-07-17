@@ -2,9 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { get, ref, onValue } from "firebase/database";
+import { get, ref } from "firebase/database";
 import { db } from "@/lib/firebase";
-import { Room, Player, Role } from "@/types/game";
+import { Player, Role } from "@/types/game";
 import { useRoomSync } from "@/hooks/useRoomSync";
 import { usePresence } from "@/hooks/usePresence";
 
@@ -22,7 +22,7 @@ import AssignRoles from "./AssignRoles";
 import SelectedCharacter from "./SelectedCharacter";
 
 
-import { Card, CardSide, CardPopup } from "@/components/ui/Card";
+import { CardSide, CardPopup } from "@/components/ui/Card";
 import Loading from "@/components/Loading";
 import ChatBox from "@/components/ChatBox";
 
@@ -130,7 +130,6 @@ function RoomPage() {
             <DashboardStoryteller
               roomData={roomData}
               updateRoomData={updateRoomData}
-              updatePlayerById={updatePlayerById}
               handleStartVote={handleStartVote}
               isStoryteller={playerData.isStoryteller}
               showRoles={showRoles}
@@ -141,11 +140,7 @@ function RoomPage() {
             <DashboardPlayer
               roomData={roomData}
               playerData={playerData}
-              updateRoomData={updateRoomData}
-              updatePlayerById={updatePlayerById}
               updatePlayerData={updatePlayerData}
-              updateVotingData={updateVotingData}
-              setOpenAssigns={setOpenAssigns}
             />}
           </div>
 
@@ -257,8 +252,7 @@ function RoomPage() {
       <CardPopup title={selectedCharacter?.name || ""} open={openCharacter} setOpen={setOpenCharacter}>
         <SelectedCharacter 
           selectedCharacter={selectedCharacter} 
-          isStoryteller={currentPlayer.isStoryteller} 
-          updateRoomData={updateRoomData}
+          isStoryteller={currentPlayer.isStoryteller}
           updateVotingData={updateVotingData}
           updatePlayerById={updatePlayerById}
           handleKickPlayer={handleKickPlayer}

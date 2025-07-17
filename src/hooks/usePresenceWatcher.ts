@@ -23,7 +23,7 @@ export function usePresenceWatcher(roomId: string) {
 
         // If player is offline, update their state and unseat them
         if (!isOnline && player.state && player.state !== 'offline') {
-          const updates: Record<string, any> = {
+          const updates: Record<string, unknown> = {
             [`rooms/${roomId}/players/${playerId}/state`]: 'offline',
             [`rooms/${roomId}/players/${playerId}/last_changed`]: Date.now(),
           };

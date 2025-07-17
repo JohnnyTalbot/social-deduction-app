@@ -1,17 +1,11 @@
 "use client";
 import Link from 'next/link';
 
-import { useIsMobile } from '@/hooks/useIsMobile';
-
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ModelPreload from '@/components/ModelPreload';
 
 export default function Home() {
-  const { isMounted, isMobileVertical, isMobileHorizontal } = useIsMobile();
-  if (!isMounted) return null;
-
-  const isMobile = isMobileVertical || isMobileHorizontal;
 
   return (
     <div className="flex flex-col justify-between items-center w-full h-screen">

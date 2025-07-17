@@ -1,5 +1,5 @@
 
-import { Room, Player, Role } from "@/types/game";
+import { Room, Player } from "@/types/game";
 
 import { Canvas } from '@react-three/fiber';
 import Character from "@/components/models/Character";
@@ -11,14 +11,13 @@ import Button from "@/components/ui/Button";
 interface SelectedCharacterProps{
   selectedCharacter?: Player;
   isStoryteller: boolean;
-  updateRoomData: (partial: Partial<Room>) => void;
   updateVotingData: (partial: Partial<Room["votingData"]>) => void;
   updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
   handleKickPlayer: (playerToKick: Player) => void;
   setOpenCharacter: (openCharacter: boolean) => void;
 }
 
-function SelectedCharacter({selectedCharacter, isStoryteller, updateRoomData, updateVotingData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
+function SelectedCharacter({selectedCharacter, isStoryteller, updateVotingData, updatePlayerById, handleKickPlayer, setOpenCharacter} : SelectedCharacterProps){
   return(
     <div className="w-full h-full flex flex-row justify-around items-center gap-2 lg:gap-5">
       <div className="flex flex-col w-[200px] h-[200px] lg:w-[400px] lg:h-[400px]">

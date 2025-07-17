@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import { Room, Player, Seat } from '@/types/game';
+import { Room, Player } from '@/types/game';
 
 interface DashboardStorytellerProps {
   roomData: Room | unknown;
   playerData: Player | unknown;
-  updateRoomData: (partial: Partial<Room>) => void;
   updatePlayerData: (partial: Partial<Player>) => void;
-  updatePlayerById: (playerId: string, partial: Partial<Player>) => void;
-  updateVotingData: (partial: Partial<Room["votingData"]>) => void;
-  setOpenAssigns: (openAssigns: boolean) => void;
   className?: string;
 }
 
@@ -16,11 +12,7 @@ export default function DashboardStoryteller({
   className,
   roomData,
   playerData,
-  updateRoomData,
   updatePlayerData,
-  updatePlayerById,
-  updateVotingData,
-  setOpenAssigns,
 }: DashboardStorytellerProps) {
   const room = roomData as Room;
   const player = playerData as Player;
