@@ -14,6 +14,7 @@ const models = [
   'character-female-d',
   'character-female-e',
   'character-female-f',
+  'character-ghost',
   'number-1',
   'number-2',
   'number-3',

@@ -66,7 +66,7 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
   return (
     <Canvas camera={{ position: [-5, 4, 4] }}>
       <ambientLight intensity={room.currentPhase != "night" ? 0.5 : 0.2} />
-      {room.currentPhase != "night" && <directionalLight color={"yellow"} position={[0, 20, 0]} />}
+      {room.currentPhase != "night" && <directionalLight color={"white"} position={[0, 20, 0]} />}
       <Table />
       
       {/* Voting Phase */}
@@ -116,8 +116,8 @@ function GameArea({ roomData, playerData, updatePlayerData, updatePlayerById, up
             key={`seat-${seat.number}`}
             position={[x, 0, z]}
             rotation={[0, CharacterRotationY, 0]}
-            model={(roomData as Room).players[seat.playerId || '']?.model || 'male-a'}
-            name={(roomData as Room).players[seat.playerId || '']?.name || `Player ${seat.number}`}
+            model={playerForSeat?.isAlive == false ? 'ghost' : playerForSeat?.model || 'male-a'}
+            name={playerForSeat?.name || `Player ${seat.number}`}
             playerData={playerForSeat}
             updatePlayerById={updatePlayerById}
             roomData={roomData as Room}

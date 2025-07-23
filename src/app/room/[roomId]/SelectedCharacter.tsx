@@ -41,7 +41,22 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateVotingData, 
       </div>
       {
       isStoryteller &&
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center gap-5">
+        <Button
+          className='px-5 py-3 lg:py-5 lg:px-8'
+          onClick={() => {
+            if (!selectedCharacter) return;
+
+            updatePlayerById(selectedCharacter.id, {
+              isAnimating: true,
+              isAlive: false
+            });
+
+            setOpenCharacter(false)
+          }}
+        >
+          <p className='text-xl lg:text-3xl'>Kill Player</p>
+        </Button>
         <Button
           className='px-5 py-3 lg:py-5 lg:px-8'
           onClick={() => {
@@ -70,10 +85,7 @@ function SelectedCharacter({selectedCharacter, isStoryteller, updateVotingData, 
               });
             });
 
-            updatePlayerById(selectedCharacter.id, {
-              currentAnimation: 'die',
-              isAnimating: true,
-            });
+            setOpenCharacter(false)
           }}
         >
           <p className='text-xl lg:text-3xl'>Nominate Player</p>
